@@ -21,7 +21,7 @@ class GameMenu{
         this.root.$lty.append(this.$menu);
         this.$single = this.$menu.find('.game_menu_block_single');
         this.$multi = this.$menu.find('.game_menu_block_multi');
-        this.$settings = this.$menu.find('.game_meny_block_settings');
+        this.$settings = this.$menu.find('.game_menu_block_settings');
 
         this.start();
     }
@@ -56,20 +56,357 @@ class GameMenu{
         this.$menu.hide();
     }
 }
-class GamePlayground{
-    constructor(root){
-        this.root = root;
-        this.$playground = $(`
-<div class = "game_palyground">
-    游戏界面，开发中！
-</div>
-        `);
-        this.root.$lty.append(this.$playground);
-        this.start();
+let GAME_OBJECT = [];
+
+class GameObject{
+    constructor(){
+        GAME_OBJECT.push(this);
+
+        this.called_start = false;
+        this.timedelta = 0;
+    }
+
+    start(){
+    }
+
+    update(){
+    }
+
+    on_del(){
+    }
+
+    del(){
+        this.on_del();
+
+        for (let i = 0; i < GAME_OBJECT.length; i++ ){
+            if (GAME_OBJECT[i] === this){
+                GAME_OBJECT.splice(i, 1);
+                break;
+            }
+        }
+    }
+}
+
+let last_timestamp;
+
+let Game_Animation = function(timestamp) {
+    for (let i = 0; i < GAME_OBJECT.length; i++) {
+        let obj = GAME_OBJECT[i];
+        if (!obj.called_start) {
+            obj.start();
+            obj.called_start = true;
+        } else {
+            obj.timedelta = timestamp - last_timestamp;
+            obj.update();
+        }
+    }
+    last_timestamp = timestamp;
+
+    requestAnimationFrame(Game_Animation);
+}
+
+requestAnimationFrame(Game_Animation);
+class GameMap extends GameObject {
+    constructor(playground){
+        super();
+        this.playground = playground;
+        this.$canvas = $(`<canvas></canvas>`);
+        this.ctx = this.$canvas[0].getContext('2d');
+        this.ctx.canvas.width = this.playground.width;
+        this.ctx.canvas.height = this.playground.height;
+        this.playground.$playground.append(this.$canvas);
     }
 
     start(){
 
+    }
+
+    update(){
+        this.render();
+    }
+
+    render(){
+        this.ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+        this.ctx.fillRect(0,0, this.ctx.canvas.width, this.ctx.canvas.height);
+
+    }
+}
+class Particle extends GameObject{
+    constructor(playground, x, y, r, vx, vy, speed, color, move_length){
+        super();
+        this.playground = playground;
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.speed = speed;
+        this.color = color;
+        this.move_length = move_length;
+        this.vy = vy;
+        this.vx = vx;
+        this.ctx = this.playground.game_map.ctx;
+        this.friction = 0.9;
+    }
+
+    start(){
+    }
+
+    update(){
+        if(this.move_length < 1 || this.speed < 1) {
+            this.del();
+            return false;
+        }
+        let moved = Math.min(this.move_length, this.speed * this.timedelta / 1000);
+        this.x += this.vx * moved;
+        this.y += this.vy * moved;
+        this.speed *= this.friction;
+        this.move_length -= moved;
+        this.render();
+    }
+
+    render(){
+        this.ctx.beginPath();
+        this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
+        this.ctx.fillStyle = this.color;
+        this.ctx.fill();
+    }
+}
+class Player extends GameObject {
+    constructor(playground, x, y, r, speed, color, is_me){
+        super();
+        this.x = x;
+        this.y = y;
+        this.playground = playground;
+        this.r = r;
+        this.speed = speed;
+        this.color = color;
+        this.is_me = is_me;
+        this.ctx = this.playground.game_map.ctx;
+        this.eps = 0.1;
+        this.vx = 0;
+        this.vy = 0;
+        this.damvx = 0;
+        this.damvy = 0;
+        this.damspeed = 0;
+        this.move_length = 0;
+        this.cur_skill = null;
+        this.friction = 0.7;
+    }
+
+    start(){
+        if(this.is_me){
+            this.listen_events();
+        }
+        else{
+            let tx = Math.random() * this.playground.width;
+            let ty = Math.random() * this.playground.height;
+            this.move(tx, ty);
+        }
+    }
+
+    listen_events(){
+        let outer = this;
+        this.playground.game_map.$canvas.on("contextmenu", function() {
+            return false;
+        })
+        this.playground.game_map.$canvas.mousedown(function(tmp) {
+            if (tmp.which === 3) {
+                outer.move(tmp.clientX, tmp.clientY);
+            } else if (tmp.which === 1){
+                if(outer.cur_skill === "fireball"){
+                    outer.shoot_ball(outer.cur_skill, tmp.clientX, tmp.clientY);
+                }
+
+                outer.cur_skill = null;
+            }
+        })
+
+        $(window).keydown(function(tmp) {
+                if (tmp.which === 81){           //表示Q键，详见keycode对照表
+                    outer.cur_skill = "fireball";
+                    return false;
+                }
+            })
+    }
+
+    shoot_ball(cur, tx, ty){
+        let x = this.x;
+        let y = this.y;
+        let r = this.playground.height * 0.02;
+        let angle = Math.atan2(ty - this.y, tx - this.x);
+        let vx = Math.cos(angle);
+        let vy = Math.sin(angle);
+        if(cur === "fireball"){
+            let color = "orange";
+            let speed = this.playground.height * 0.5;
+            let move_length = this.playground.height * 0.8;
+            new FireBall(this.playground, this, x, y, r, vx, vy, color, speed, move_length, this.playground.height * 0.01);
+        }
+    }
+
+    get_dist(x1, x2, y1, y2){
+        let dx = x1 - x2;
+        let dy = y1 - y2;
+        return Math.sqrt(dy * dy + dx * dx);
+    }
+
+    move(tx, ty){
+        this.move_length = this.get_dist(this.x, tx, this.y, ty);
+        let angle = Math.atan2(ty - this.y, tx - this.x);
+        this.vx = Math.cos(angle);
+        this.vy = Math.sin(angle);
+    }
+
+    attacked(angle, damage){
+        for (let i = 0; i < 10 + Math.random() * 8; i++){
+            let x = this.x;
+            let y = this.y;
+            let r = this.r * Math.random() * 0.2;
+            let angle = Math.PI * 2 * Math.random();
+            let vx = Math.cos(angle);
+            let vy = Math.sin(angle);
+            let color = this.color;
+            let speed = this.speed * 10; 
+            let move_length = this.r * Math.random() * 7;
+            new Particle(this.playground, x, y, r, vx, vy, speed, color, move_length);
+        }
+        this.r -= damage;
+        if (this.r < 10){
+            this.del();
+            return false;
+        } else {
+            this.damvx = Math.cos(angle);
+            this.damvy = Math.sin(angle);
+            this.damspeed = damage * 70;
+
+        }
+    }
+
+    update(){
+        this.render();
+        if(this.damspeed > 9) {
+            this.vx = this.vy = this.move_length = 0;
+            this.x += this.damvx * this.damspeed * this.timedelta / 1000;
+            this.y += this.damvy * this.damspeed * this.timedelta / 1000;
+            this.damspeed *= this.friction;
+        } else {
+            if(this.move_length < this.eps){
+                this.move_length = this.vx = this.vy = 0;
+                if(!this.is_me){
+                    let tx = Math.random() * this.playground.width;
+                    let ty = Math.random() * this.playground.height;
+                    this.move(tx, ty);
+                }
+            } else {
+                let moved = Math.min(this.move_length, this.speed * this.timedelta / 1000);
+                this.x += this.vx * moved;
+                this.y += this.vy * moved;
+                this.move_length -= moved;
+            }
+        }
+    }
+
+    render(){
+        this.ctx.beginPath();
+        this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
+        this.ctx.fillStyle = this.color;
+        this.ctx.fill();
+    }
+}
+class FireBall extends GameObject {
+    constructor(playground, player, x, y, r, vx, vy, color, speed, move_length, damage){
+        super();
+        this.playground = playground;
+        this.player = player;
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.vx = vx;
+        this.vy = vy;
+        this.color = color;
+        this.speed = speed;
+        this.move_length = move_length;
+        this.ctx = this.playground.game_map.ctx;
+        this.damage = damage;
+        this.eps = 0.1;
+    }
+
+    start(){
+    }
+
+    update(){
+        if (this.move_length < this.eps){
+            this.del();
+            return false;
+        }
+        let moved = Math.min(this.move_length, this.speed * this.timedelta / 1000);
+        this.x += this.vx * moved;
+        this.y += this.vy * moved;
+        this.move_length -= moved;
+        for(let i = 0; i < this.playground.players.length; i++){
+            let player = this.playground.players[i];
+            if(this.player != player && this.is_collision(player)){
+                this.attack(player);
+            }
+        }
+
+        this.render();
+    }
+
+    get_dist(x1, x2, y1, y2){
+        let dx = x1 - x2;
+        let dy = y1 - y2;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    is_collision(player){
+        let distance = this.get_dist(this.x, player.x, this.y, player.y);
+        if (distance < this.r + player.r){
+            return true;
+        }
+        return false;
+    }
+
+    attack(player){
+        this.del();
+
+        let angle = Math.atan2(player.y - this.y, player.x - this.x);
+        player.attacked(angle, this.damage);
+    }
+
+    render(){
+        this.ctx.beginPath();
+        this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
+        this.ctx.fillStyle = this.color;
+        this.ctx.fill();
+    }
+}
+class GamePlayground{
+    constructor(root){
+        this.root = root;
+        this.$playground = $(`
+<div class = "game_playground">
+</div>
+        `);
+        this.root.$lty.append(this.$playground);
+        this.width = this.$playground.width();
+        this.height = this.$playground.height();
+        this.game_map = new GameMap(this);
+        this.players = [];
+        this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, this.height * 0.2, "pink", true));
+
+        for(let i = 0; i < 5; i++){
+            this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, this.height * 0.2, this.random_color(), false));
+        }
+
+        this.start();
+    }
+
+    start(){
+    }
+
+    random_color() {
+        let colors = ["blue", "green", "red", "pink", "grey", "purple"];
+        return colors[Math.floor(Math.random() * 6)];
     }
 
     show(){
@@ -83,11 +420,6 @@ class GamePlayground{
 class GameSettings{
     constructor(root){
         this.root = root;
-        this.$settings = $(`
-<div class = "game_settings">
-设置界面，开发中！！
-</div>
-        `);
 
         this.root.$lty.append(this.$settings);
         this.start();
@@ -105,13 +437,12 @@ class GameSettings{
     }
 }
 
-class Game{
+export class Game{
     constructor(id){
         this.id = id;
         this.$lty = $('#' + id);
-        this.menu = new GameMenu(this);
+        // this.menu = new GameMenu(this);
         this.playground = new GamePlayground(this);
-        this.settings = new GameSettings(this);
 
         this.start();
     }

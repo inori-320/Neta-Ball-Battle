@@ -21,7 +21,7 @@ class GameMenu{
         this.root.$lty.append(this.$menu);
         this.$single = this.$menu.find('.game_menu_block_single');
         this.$multi = this.$menu.find('.game_menu_block_multi');
-        this.$settings = this.$menu.find('.game_meny_block_settings');
+        this.$settings = this.$menu.find('.game_menu_block_settings');
 
         this.start();
     }
