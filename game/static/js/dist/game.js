@@ -210,13 +210,13 @@ class Player extends GameObject {
             return false;
         })
         this.playground.game_map.$canvas.mousedown(function(tmp) {
+            const rect = outer.ctx.canvas.getBoundingClientRect();
             if (tmp.which === 3) {
-                outer.move(tmp.clientX, tmp.clientY);
+                outer.move(tmp.clientX - rect.left, tmp.clientY - rect.top);
             } else if (tmp.which === 1){
                 if(outer.cur_skill === "fireball"){
-                    outer.shoot_ball(outer.cur_skill, tmp.clientX, tmp.clientY);
+                    outer.shoot_ball(outer.cur_skill, tmp.clientX - rect.left, tmp.clientY - rect.top);
                 }
-
                 outer.cur_skill = null;
             }
         })
@@ -402,17 +402,7 @@ class GamePlayground{
 <div class = "game_playground">
 </div>
         `);
-        this.root.$lty.append(this.$playground);
-        this.width = this.$playground.width();
-        this.height = this.$playground.height();
-        this.game_map = new GameMap(this);
-        this.players = [];
-        this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, this.height * 0.2, "pink", true));
-
-        for(let i = 0; i < 5; i++){
-            this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, this.height * 0.2, this.random_color(), false));
-        }
-
+        this.hide();
         this.start();
     }
 
@@ -426,6 +416,16 @@ class GamePlayground{
 
     show(){
         this.$playground.show();
+        this.root.$lty.append(this.$playground);
+        this.width = this.$playground.width();
+        this.height = this.$playground.height();
+        this.game_map = new GameMap(this);
+        this.players = []; 
+        this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, this.height * 0.2, "pink", true));
+
+        for(let i = 0; i < 5; i++){
+            this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, this.height * 0.2, this.random_color(), false));
+        }
     }
 
     hide(){
@@ -456,7 +456,7 @@ export class Game{
     constructor(id){
         this.id = id;
         this.$lty = $('#' + id);
-        // this.menu = new GameMenu(this);
+        this.menu = new GameMenu(this);
         this.playground = new GamePlayground(this);
 
         this.start();

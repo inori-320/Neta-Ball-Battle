@@ -38,13 +38,13 @@ class Player extends GameObject {
             return false;
         })
         this.playground.game_map.$canvas.mousedown(function(tmp) {
+            const rect = outer.ctx.canvas.getBoundingClientRect();
             if (tmp.which === 3) {
-                outer.move(tmp.clientX, tmp.clientY);
+                outer.move(tmp.clientX - rect.left, tmp.clientY - rect.top);
             } else if (tmp.which === 1){
                 if(outer.cur_skill === "fireball"){
-                    outer.shoot_ball(outer.cur_skill, tmp.clientX, tmp.clientY);
+                    outer.shoot_ball(outer.cur_skill, tmp.clientX - rect.left, tmp.clientY - rect.top);
                 }
-
                 outer.cur_skill = null;
             }
         })
