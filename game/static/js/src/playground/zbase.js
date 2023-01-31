@@ -23,7 +23,7 @@ class GamePlayground{
     }
 
     random_color() {
-        let colors = ["blue", "green", "red", "pink", "grey", "purple"];
+        let colors = ["blue", "green", "red", "white", "grey", "purple"];
         return colors[Math.floor(Math.random() * 6)];
     }
 

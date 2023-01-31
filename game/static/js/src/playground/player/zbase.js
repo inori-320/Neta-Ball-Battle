@@ -17,6 +17,7 @@ class Player extends GameObject {
         this.damspeed = 0;
         this.move_length = 0;
         this.cur_skill = null;
+        this.cold_time = 0;
         this.friction = 0.7;
     }
 
@@ -93,7 +94,7 @@ class Player extends GameObject {
             let vx = Math.cos(angle);
             let vy = Math.sin(angle);
             let color = this.color;
-            let speed = this.speed * 10; 
+            let speed = this.speed * 10;
             let move_length = this.r * Math.random() * 7;
             new Particle(this.playground, x, y, r, vx, vy, speed, color, move_length);
         }
@@ -105,12 +106,18 @@ class Player extends GameObject {
             this.damvx = Math.cos(angle);
             this.damvy = Math.sin(angle);
             this.damspeed = damage * 70;
-
         }
     }
 
     update(){
         this.render();
+        this.cold_time += this.timedelta / 1000;
+        if(!this.is_me && this.cold_time > 3 && Math.random() < 1 / 250.0){
+            let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
+            let tx = player.x + player.speed * this.vx * this.timedelta / 1000 * 0.3;
+            let ty = player.y + player.speed * this.vy * this.timedelta / 1000 * 0.3;
+            this.shoot_ball("fireball", tx, ty);
+        }
         if(this.damspeed > 9) {
             this.vx = this.vy = this.move_length = 0;
             this.x += this.damvx * this.damspeed * this.timedelta / 1000;
@@ -138,5 +145,13 @@ class Player extends GameObject {
         this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
+    }
+
+    on_del(){
+        for(let i = 0; i < this.playground.players.length; i++){
+            if(this.playground.players[i] === this){
+                this.playground.players.splice(i, 1);
+            }
+        }
     }
 }
