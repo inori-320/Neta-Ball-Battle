@@ -18,6 +18,7 @@ class GameMenu{
     </div>
 </div>
 `);
+        this.$menu.hide();
         this.root.$lty.append(this.$menu);
         this.$single = this.$menu.find('.game_menu_block_single');
         this.$multi = this.$menu.find('.game_menu_block_multi');

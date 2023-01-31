@@ -19,6 +19,11 @@ class Player extends GameObject {
         this.cur_skill = null;
         this.cold_time = 0;
         this.friction = 0.7;
+
+        if(this.is_me){
+            this.img = new Image();
+            this.img.src = this.playground.root.settings.photo;
+        }
     }
 
     start(){
@@ -110,7 +115,6 @@ class Player extends GameObject {
     }
 
     update(){
-        this.render();
         this.cold_time += this.timedelta / 1000;
         if(!this.is_me && this.cold_time > 3 && Math.random() < 1 / 250.0){
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
@@ -138,13 +142,24 @@ class Player extends GameObject {
                 this.move_length -= moved;
             }
         }
+        this.render();
     }
 
     render(){
-        this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
-        this.ctx.fillStyle = this.color;
-        this.ctx.fill();
+        if(this.is_me){
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+            this.ctx.stroke();
+            this.ctx.clip();
+            this.ctx.drawImage(this.img, this.x - this.r, this.y - this.r, this.r * 2, this.r * 2);
+            this.ctx.restore();
+        } else {
+            this.ctx.beginPath();
+            this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
+            this.ctx.fillStyle = this.color;
+            this.ctx.fill();
+        }
     }
 
     on_del(){

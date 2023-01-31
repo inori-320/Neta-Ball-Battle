@@ -18,6 +18,7 @@ class GameMenu{
     </div>
 </div>
 `);
+        this.$menu.hide();
         this.root.$lty.append(this.$menu);
         this.$single = this.$menu.find('.game_menu_block_single');
         this.$multi = this.$menu.find('.game_menu_block_multi');
@@ -191,6 +192,11 @@ class Player extends GameObject {
         this.cur_skill = null;
         this.cold_time = 0;
         this.friction = 0.7;
+
+        if(this.is_me){
+            this.img = new Image();
+            this.img.src = this.playground.root.settings.photo;
+        }
     }
 
     start(){
@@ -282,7 +288,6 @@ class Player extends GameObject {
     }
 
     update(){
-        this.render();
         this.cold_time += this.timedelta / 1000;
         if(!this.is_me && this.cold_time > 3 && Math.random() < 1 / 250.0){
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
@@ -310,13 +315,24 @@ class Player extends GameObject {
                 this.move_length -= moved;
             }
         }
+        this.render();
     }
 
     render(){
-        this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
-        this.ctx.fillStyle = this.color;
-        this.ctx.fill();
+        if(this.is_me){
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+            this.ctx.stroke();
+            this.ctx.clip();
+            this.ctx.drawImage(this.img, this.x - this.r, this.y - this.r, this.r * 2, this.r * 2);
+            this.ctx.restore();
+        } else {
+            this.ctx.beginPath();
+            this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
+            this.ctx.fillStyle = this.color;
+            this.ctx.fill();
+        }
     }
 
     on_del(){
@@ -420,7 +436,7 @@ class GamePlayground{
         this.width = this.$playground.width();
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
-        this.players = []; 
+        this.players = [];
         this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, this.height * 0.2, "pink", true));
 
         for(let i = 0; i < 5; i++){
@@ -435,20 +451,49 @@ class GamePlayground{
 class GameSettings{
     constructor(root){
         this.root = root;
+        this.platform = "WEB";
+        this.username = "";
+        this.photo = "";
 
-        this.root.$lty.append(this.$settings);
         this.start();
     }
 
     start(){
+        this.get_info();
+    }
+
+    register(){
+    }
+
+    login(){
+    }
+
+    get_info(){
+        let outer = this;
+        $.ajax({
+            url: "http://8.130.15.181:8000/settings/getinfo/",
+            type: "GET",
+            data: {
+                platform: outer.platform,
+            },
+            success: function(resp){
+                console.log(resp);
+                if(resp.result === "success"){
+                    outer.username = resp.username;
+                    outer.photo = resp.photo;
+                    outer.hide();
+                    outer.root.menu.show();
+                } else {
+                    outer.login();
+                }
+            }
+        });
     }
 
     show(){
-        this.$setting.show();
     }
 
     hide(){
-        this.$setting.hide();
     }
 }
 
@@ -456,6 +501,7 @@ export class Game{
     constructor(id){
         this.id = id;
         this.$lty = $('#' + id);
+        this.settings = new GameSettings(this);
         this.menu = new GameMenu(this);
         this.playground = new GamePlayground(this);
 
