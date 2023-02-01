@@ -3,14 +3,14 @@
     height:100%;
     background-image: url("/static/image/menu/background.jpg");
     background-size: 100% 100%;
-    user-select:none;
+    user-select: none;
 }
 
 .game_menu_block{
     width: 20vh;
     position: relative;
-    top: 50%;
-    left:19%;
+    top: 45%;
+    left:18%;
 }
 
 .game_menu_block_item{
@@ -36,4 +36,126 @@
     width:100%;
     height:100%;
     user-select:none;
+}
+
+.game_settings{
+    width: 100%;
+    height: 100%;
+    background-image: url("/static/image/menu/background.jpg");
+    background-size: 100% 100%;
+    user-select: none;
+}
+
+.game_settings_login{
+    height: 60vh;
+    width: 50vh;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 30px;
+}
+
+.game_settings_register{
+    height: 70vh;
+    width: 50vh;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 30px;
+}
+
+.game_settings_title{
+    color: white;
+    font-size: 5vh;
+    text-align: center;
+    padding-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.game_settings_item{
+    width: 100%;
+    height: 100%;
+}
+
+.game_settings_item > input {
+    width: 90%;
+    line-height: 4vh;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.game_settings_username{
+    display: block;
+    height: 10vh;
+}
+
+.game_settings_passwd{
+    display: block;
+    height: 10vh;
+}
+
+.game_settings_comfirm_passwd{
+    display: block;
+    height: 10vh;
+}
+
+.game_settings_affirm{
+    display: block;
+    height: 10vh;
+}
+
+.game_settings_item > button {
+    color: white;
+    width: 90%;
+    line-height: 4vh;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #0197FB;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.game_settings_error{
+    color: red;
+    font-size: 0.8vh;
+    display: inline;
+    float: left;
+    padding-left: 1.7vw;
+}
+
+.game_settings_choice{
+    color: white;
+    font-size: 2.5vh;
+    display: inline;
+    float: right;
+    padding-right: 2.5vw;
+    cursor: pointer;
+}
+
+.game_settings_qq{
+    display: block;
+    height: 10vh;
+}
+
+.game_settings_qq > img {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
+
+.game_settings_qq_title{
+    font-size: 2vh;
+    color: white;
+    text-align: center;
+    padding-top: 3vh;
 }
