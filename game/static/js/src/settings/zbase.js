@@ -110,6 +110,7 @@ class GameSettings{
     }
 
     listening_events(){
+        let outer = this;
         this.listening_events_login();
         this.listening_events_register();
     }
@@ -119,6 +120,9 @@ class GameSettings{
         this.$login_register.click(function(){
             outer.register();
         });
+        this.$login_affirm.click(function(){
+            outer.remote_login();
+        })
     }
 
     listening_events_register(){
@@ -126,6 +130,9 @@ class GameSettings{
         this.$register_login.click(function(){
             outer.login();
         });
+        this.$register_affirm.click(function(){
+            outer.remote_register();
+        })
     }
 
     register(){
@@ -136,6 +143,70 @@ class GameSettings{
     login(){
         this.$register.hide();
         this.$login.show();
+    }
+
+    remote_login(){
+        let outer = this;
+        let username = this.$login_username.val();
+        let passwd = this.$login_passwd.val();
+        this.$login_error.empty();
+        console.log(username, passwd);
+        $.ajax({
+            url: "http://8.130.15.181:8000/settings/login/",
+            type: "GET",
+            data: {
+                username: username,
+                password: passwd,
+            },
+            success: function(resp){
+                console.log(resp);
+                if(resp.result === "success"){
+                    location.reload();
+                } else {
+                    outer.$login_error.html(resp.result);
+                }
+            }
+        })
+    }
+
+    remote_register(){
+        let outer = this;
+        let username = this.$register_username.val();
+        let passwd_1 = this.$register_passwd_1.val();
+        let passwd_2 = this.$register_passwd_2.val();
+        this.$register_error.empty();
+
+        $.ajax({
+            url:"http://8.130.15.181:8000/settings/register/",
+            type: "GET",
+            data:{
+                username: username,
+                passwd_1: passwd_1,
+                passwd_2: passwd_2,
+            },
+            success: function(resp){
+                console.log(resp);
+                if(resp.result == "success"){
+                    outer.login();
+                } else {
+                    outer.$register_error.html(resp.result);
+                }
+            }
+
+        })
+    }
+
+    remote_logout(){
+        $.ajax({
+            url: "http://8.130.15.181:8000/settings/logout/",
+            type: "GET",
+            success: function(resp) {
+                console.log(resp);
+                if(resp.result === "success"){
+                    location.reload();
+                }
+            }
+        })
     }
 
     get_info(){

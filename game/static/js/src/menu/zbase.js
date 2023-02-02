@@ -12,8 +12,8 @@ class GameMenu{
             多人模式
         </div>
         <br>
-        <div class = "game_menu_block_item game_meny_block_settings">
-            设置
+        <div class = "game_menu_block_item game_menu_block_settings">
+            退出
         </div>
     </div>
 </div>
@@ -37,16 +37,15 @@ class GameMenu{
             console.log("click single mode.");
             now_menu.hide();
             now_menu.root.playground.show();
-        })
+        });
         this.$multi.click(function(){
             console.log("click multi mode.");
 
-        })
+        });
         this.$settings.click(function(){
             console.log("launch setting.");
-            now_menu.hide();
-            now_menu.root.settings.show();
-        })
+            now_menu.root.settings.remote_logout();
+        });
     }
 
     show(){
