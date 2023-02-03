@@ -13,7 +13,7 @@ class FireBall extends GameObject {
         this.move_length = move_length;
         this.ctx = this.playground.game_map.ctx;
         this.damage = damage;
-        this.eps = 0.1;
+        this.eps = 0.01;
     }
 
     start(){
@@ -60,8 +60,9 @@ class FireBall extends GameObject {
     }
 
     render(){
+        let scale = this.playground.scale;
         this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
+        this.ctx.arc(this.x * scale, this.y * scale, this.r * scale, 0, Math.PI*2, false);
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
     }

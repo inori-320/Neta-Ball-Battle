@@ -18,7 +18,7 @@ class Particle extends GameObject{
     }
 
     update(){
-        if(this.move_length < 1 || this.speed < 1) {
+        if(this.move_length < 0.01 || this.speed < 0.01) {
             this.del();
             return false;
         }
@@ -31,8 +31,9 @@ class Particle extends GameObject{
     }
 
     render(){
+        let scale = this.playground.scale;
         this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, this.r, 0, Math.PI*2, false);
+        this.ctx.arc(this.x * scale, this.y * scale, this.r * scale, 0, Math.PI*2, false);
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
     }
