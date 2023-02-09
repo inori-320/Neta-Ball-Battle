@@ -433,6 +433,28 @@ class FireBall extends GameObject {
         this.ctx.fill();
     }
 }
+class MultiPlayer{
+    constructor(playground){
+        this.playground = playground;
+
+        this.ws = new WebSocket("wss://8.130.15.181:8000/wss/multiplayer/");
+
+        this.start();
+    }
+
+    start(){
+    }
+
+    send_create_player(){
+        this.ws.send(JSON.stringify({
+            'message': "hello server",
+        }));
+    }
+
+    receive_create_player(){
+
+    }
+}
 class GamePlayground{
     constructor(root){
         this.root = root;
@@ -470,6 +492,7 @@ class GamePlayground{
     }
 
     show(mode){
+        let outer = this;
         this.$playground.show();
         this.width = this.$playground.width();
         this.height = this.$playground.height();
@@ -483,7 +506,11 @@ class GamePlayground{
                 this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), "robot"));
             }
         } else {
+            this.mps = new MultiPlayer(this);
 
+            this.mps.ws.onopen = function(){
+                outer.mps.send_create_player();
+            }
         }
     }
 

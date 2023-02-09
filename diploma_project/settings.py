@@ -142,7 +142,7 @@ CACHES = {
         }
 USER_AGENTS_CACHE = 'default'
 
-ASGI_APPLICATION = 'acapp.asgi.application'
+ASGI_APPLICATION = 'diploma_project.asgi.application'
 CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",

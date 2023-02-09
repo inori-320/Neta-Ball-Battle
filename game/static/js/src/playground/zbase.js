@@ -35,6 +35,7 @@ class GamePlayground{
     }
 
     show(mode){
+        let outer = this;
         this.$playground.show();
         this.width = this.$playground.width();
         this.height = this.$playground.height();
@@ -48,7 +49,11 @@ class GamePlayground{
                 this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), "robot"));
             }
         } else {
+            this.mps = new MultiPlayer(this);
 
+            this.mps.ws.onopen = function(){
+                outer.mps.send_create_player();
+            }
         }
     }
 
