@@ -36,10 +36,12 @@ class GameMenu{
         this.$single.click(function(){
             console.log("click single mode.");
             now_menu.hide();
-            now_menu.root.playground.show();
+            now_menu.root.playground.show("single mode");
         });
         this.$multi.click(function(){
             console.log("click multi mode.");
+            now_menu.hide();
+            now_menu.root.playground.show("multi mode");
 
         });
         this.$settings.click(function(){

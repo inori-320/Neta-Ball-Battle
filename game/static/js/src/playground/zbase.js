@@ -21,9 +21,9 @@ class GamePlayground{
     resize(){
         this.width = this.$playground.width();
         this.height = this.$playground.height();
-        let unit = Math.min(this.width / 16, this.height / 9);
-        this.width = unit * 16;
-        this.height = unit * 9;
+        let unit = Math.min(this.width / 20, this.height / 9.5);
+        this.width = unit * 20;
+        this.height = unit * 9.5;
         this.scale = this.height;
 
         if(this.game_map) this.game_map.resize();
@@ -34,18 +34,21 @@ class GamePlayground{
         return colors[Math.floor(Math.random() * 6)];
     }
 
-    show(){
+    show(mode){
         this.$playground.show();
-        this.resize();
-
         this.width = this.$playground.width();
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
-        this.players = [];
-        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5 , 0.05, 0.2, "pink", true));
+        this.resize();
 
-        for(let i = 0; i < 5; i++){
-            this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), false));
+        this.players = [];
+        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5 , 0.05, 0.2, "pink", "me", this.root.settings.username, this.root.settings.photo));
+        if(mode === "single mode"){
+            for(let i = 0; i < 5; i++){
+                this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), "robot"));
+            }
+        } else {
+
         }
     }
 

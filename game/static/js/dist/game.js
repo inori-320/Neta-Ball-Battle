@@ -36,10 +36,12 @@ class GameMenu{
         this.$single.click(function(){
             console.log("click single mode.");
             now_menu.hide();
-            now_menu.root.playground.show();
+            now_menu.root.playground.show("single mode");
         });
         this.$multi.click(function(){
             console.log("click multi mode.");
+            now_menu.hide();
+            now_menu.root.playground.show("multi mode");
 
         });
         this.$settings.click(function(){
@@ -179,7 +181,7 @@ class Particle extends GameObject{
     }
 }
 class Player extends GameObject {
-    constructor(playground, x, y, r, speed, color, is_me){
+    constructor(playground, x, y, r, speed, color, character, username, photo){
         super();
         this.x = x;
         this.y = y;
@@ -187,7 +189,9 @@ class Player extends GameObject {
         this.r = r;
         this.speed = speed;
         this.color = color;
-        this.is_me = is_me;
+        this.character = character;
+        this.username = username;
+        this.photo = photo;
         this.ctx = this.playground.game_map.ctx;
         this.eps = 0.01;
         this.vx = 0;
@@ -201,14 +205,14 @@ class Player extends GameObject {
         this.friction = 0.7;
         this.alive = true;
 
-        if(this.is_me){
+        if(character !== "robot"){
             this.img = new Image();
-            this.img.src = this.playground.root.settings.photo;
+            this.img.src = photo;
         }
     }
 
     start(){
-        if(this.is_me){
+        if(this.character === "me"){
             this.listen_events();
         }
         else{
@@ -306,7 +310,7 @@ class Player extends GameObject {
 
     update_move(){
         this.cold_time += this.timedelta / 1000;
-        if(!this.is_me && this.cold_time > 3 && Math.random() < 1 / 250.0){
+        if(this.character === "robot" && this.cold_time > 3 && Math.random() < 1 / 250.0){
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
             let tx = player.x + player.speed * this.vx * this.timedelta / 1000 * 0.3;
             let ty = player.y + player.speed * this.vy * this.timedelta / 1000 * 0.3;
@@ -320,7 +324,7 @@ class Player extends GameObject {
         } else {
             if(this.move_length < this.eps){
                 this.move_length = this.vx = this.vy = 0;
-                if(!this.is_me){
+                if(this.character === "robot"){
                     let tx = Math.random() * this.playground.width / this.playground.scale;
                     let ty = Math.random() * this.playground.height / this.playground.scale;
                     this.move(tx, ty);
@@ -336,7 +340,7 @@ class Player extends GameObject {
 
     render(){
         let scale = this.playground.scale;
-        if(this.is_me){
+        if(this.character !== "robot"){
             this.ctx.save();
             this.ctx.beginPath();
             this.ctx.arc(this.x * scale, this.y * scale, this.r * scale, 0, Math.PI * 2, false);
@@ -452,9 +456,9 @@ class GamePlayground{
     resize(){
         this.width = this.$playground.width();
         this.height = this.$playground.height();
-        let unit = Math.min(this.width / 16, this.height / 9);
-        this.width = unit * 16;
-        this.height = unit * 9;
+        let unit = Math.min(this.width / 20, this.height / 9.5);
+        this.width = unit * 20;
+        this.height = unit * 9.5;
         this.scale = this.height;
 
         if(this.game_map) this.game_map.resize();
@@ -465,18 +469,21 @@ class GamePlayground{
         return colors[Math.floor(Math.random() * 6)];
     }
 
-    show(){
+    show(mode){
         this.$playground.show();
-        this.resize();
-
         this.width = this.$playground.width();
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
-        this.players = [];
-        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5 , 0.05, 0.2, "pink", true));
+        this.resize();
 
-        for(let i = 0; i < 5; i++){
-            this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), false));
+        this.players = [];
+        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5 , 0.05, 0.2, "pink", "me", this.root.settings.username, this.root.settings.photo));
+        if(mode === "single mode"){
+            for(let i = 0; i < 5; i++){
+                this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), "robot"));
+            }
+        } else {
+
         }
     }
 

@@ -1,5 +1,5 @@
 class Player extends GameObject {
-    constructor(playground, x, y, r, speed, color, is_me){
+    constructor(playground, x, y, r, speed, color, character, username, photo){
         super();
         this.x = x;
         this.y = y;
@@ -7,7 +7,9 @@ class Player extends GameObject {
         this.r = r;
         this.speed = speed;
         this.color = color;
-        this.is_me = is_me;
+        this.character = character;
+        this.username = username;
+        this.photo = photo;
         this.ctx = this.playground.game_map.ctx;
         this.eps = 0.01;
         this.vx = 0;
@@ -21,14 +23,14 @@ class Player extends GameObject {
         this.friction = 0.7;
         this.alive = true;
 
-        if(this.is_me){
+        if(character !== "robot"){
             this.img = new Image();
-            this.img.src = this.playground.root.settings.photo;
+            this.img.src = photo;
         }
     }
 
     start(){
-        if(this.is_me){
+        if(this.character === "me"){
             this.listen_events();
         }
         else{
@@ -126,7 +128,7 @@ class Player extends GameObject {
 
     update_move(){
         this.cold_time += this.timedelta / 1000;
-        if(!this.is_me && this.cold_time > 3 && Math.random() < 1 / 250.0){
+        if(this.character === "robot" && this.cold_time > 3 && Math.random() < 1 / 250.0){
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
             let tx = player.x + player.speed * this.vx * this.timedelta / 1000 * 0.3;
             let ty = player.y + player.speed * this.vy * this.timedelta / 1000 * 0.3;
@@ -140,7 +142,7 @@ class Player extends GameObject {
         } else {
             if(this.move_length < this.eps){
                 this.move_length = this.vx = this.vy = 0;
-                if(!this.is_me){
+                if(this.character === "robot"){
                     let tx = Math.random() * this.playground.width / this.playground.scale;
                     let ty = Math.random() * this.playground.height / this.playground.scale;
                     this.move(tx, ty);
@@ -156,7 +158,7 @@ class Player extends GameObject {
 
     render(){
         let scale = this.playground.scale;
-        if(this.is_me){
+        if(this.character !== "robot"){
             this.ctx.save();
             this.ctx.beginPath();
             this.ctx.arc(this.x * scale, this.y * scale, this.r * scale, 0, Math.PI * 2, false);
