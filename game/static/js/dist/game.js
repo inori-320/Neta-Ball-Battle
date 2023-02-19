@@ -66,6 +66,17 @@ class GameObject{
 
         this.called_start = false;
         this.timedelta = 0;
+        this.uid = this.create_uid();
+    }
+
+    create_uid(){
+        let outer = this;
+        let res = ""l;
+        for(let i = 0; i < 8; i ++){
+            let x = parseInt(Math.floor(Math.random() * 10));
+            res += x;
+        }
+        return res;
     }
 
     start(){
@@ -215,7 +226,7 @@ class Player extends GameObject {
         if(this.character === "me"){
             this.listen_events();
         }
-        else{
+        else if (this.character === "robot"){
             let tx = Math.random() * this.playground.width / this.playground.scale;
             let ty = Math.random() * this.playground.height / this.playground.scale;
             this.move(tx, ty);
@@ -443,16 +454,47 @@ class MultiPlayer{
     }
 
     start(){
+        this.handle_receive();
     }
 
-    send_create_player(){
+    handle_receive(){
+        let outer = this;
+        this.ws.onmessage = function(s) {
+            let data = JSON.parse(s.data);
+            let event = data.event;
+            let uid = data.uid;
+            if(uid === outer.uid) return false;
+            if (event === "create_player"){
+                outer.receive_create_player(uid, data.username, data.photo);
+            }
+        }
+    }
+
+    send_create_player(username, photo){
+        let outer = this;
         this.ws.send(JSON.stringify({
-            'message': "hello server",
+            'event': "create_player",
+            'uid': outer.uid,
+            'username': username,
+            'photo': photo,
         }));
     }
 
-    receive_create_player(){
+    receive_create_player(uid, username, photo){
+        let player = new Player(
+            this.playground,
+            this.playground.width / 2 / this.playground.scale,
+            0.5,
+            0.05,
+            "white",
+            0.15,
+            "enemy",
+            username,
+            photo
+        );
 
+        player.uid = uid;
+        this.playground.players.push(player);
     }
 
 }
@@ -508,9 +550,10 @@ class GamePlayground{
             }
         } else {
             this.mps = new MultiPlayer(this);
+            this.mps.uid = this.players[0].uid;
 
             this.mps.ws.onopen = function(){
-                outer.mps.send_create_player();
+                outer.mps.send_create_player(outer.root.settings.username, outer.root.settings.photo);
             }
         }
     }

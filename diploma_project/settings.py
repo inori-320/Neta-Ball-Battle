@@ -151,3 +151,4 @@ CHANNEL_LAYERS = {
                 },
             },
         }
+Room_Capacity = 3

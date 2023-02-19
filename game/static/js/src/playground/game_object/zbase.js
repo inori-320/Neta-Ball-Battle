@@ -6,6 +6,17 @@ class GameObject{
 
         this.called_start = false;
         this.timedelta = 0;
+        this.uid = this.create_uid();
+    }
+
+    create_uid(){
+        let outer = this;
+        let res = ""l;
+        for(let i = 0; i < 8; i ++){
+            let x = parseInt(Math.floor(Math.random() * 10));
+            res += x;
+        }
+        return res;
     }
 
     start(){

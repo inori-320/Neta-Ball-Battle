@@ -33,7 +33,7 @@ class Player extends GameObject {
         if(this.character === "me"){
             this.listen_events();
         }
-        else{
+        else if (this.character === "robot"){
             let tx = Math.random() * this.playground.width / this.playground.scale;
             let ty = Math.random() * this.playground.height / this.playground.scale;
             this.move(tx, ty);
