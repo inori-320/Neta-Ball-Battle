@@ -1,6 +1,6 @@
 #! /bin/bash
 
-path=/home/acs/diploma_project/game/static/js/
+path=/home/lty/diploma_project/game/static/js/
 js_path_dist=${path}dist/
 js_path_src=${path}src/
 

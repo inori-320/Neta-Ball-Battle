@@ -593,7 +593,7 @@ class GameSettings{
         </div>
         <br>
         <div class = "game_settings_qq">
-            <img width = "40" src = "http://8.130.15.181:8000/static/image/settings/qq_logo.png">
+            <img width = "40" src = "http://59.110.53.20:8000/static/image/settings/qq_logo.png">
             <br>
             <div class = "game_settings_qq_title">
                 QQ一键登录
@@ -631,7 +631,7 @@ class GameSettings{
         </div>
         <br>
         <div class = "game_settings_qq">
-            <img width = "40" src = "http://8.130.15.181:8000/static/image/settings/qq_logo.png">
+            <img width = "40" src = "http://59.110.53.20:8000/static/image/settings/qq_logo.png">
             <br>
             <div class = "game_settings_qq_title">
                 QQ一键注册
@@ -716,7 +716,7 @@ class GameSettings{
         this.$login_error.empty();
         console.log(username, passwd);
         $.ajax({
-            url: "http://8.130.15.181:8000/settings/login/",
+            url: "http://59.110.53.20:8000/settings/login/",
             type: "GET",
             data: {
                 username: username,
@@ -741,7 +741,7 @@ class GameSettings{
         this.$register_error.empty();
 
         $.ajax({
-            url:"http://8.130.15.181:8000/settings/register/",
+            url:"http://59.110.53.20:8000/settings/register/",
             type: "GET",
             data:{
                 username: username,
@@ -762,7 +762,7 @@ class GameSettings{
 
     remote_logout(){
         $.ajax({
-            url: "http://8.130.15.181:8000/settings/logout/",
+            url: "http://59.110.53.20:8000/settings/logout/",
             type: "GET",
             success: function(resp) {
                 console.log(resp);
@@ -776,7 +776,7 @@ class GameSettings{
     get_info(){
         let outer = this;
         $.ajax({
-            url: "http://8.130.15.181:8000/settings/getinfo/",
+            url: "http://59.110.53.20:8000/settings/getinfo/",
             type: "GET",
             data: {
                 platform: outer.platform,
