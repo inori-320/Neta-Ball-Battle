@@ -197,16 +197,20 @@ class GameSettings{
     }
 
     remote_logout(){
-        $.ajax({
-            url: "http://59.110.53.20:8000/settings/logout/",
-            type: "GET",
-            success: function(resp) {
-                console.log(resp);
-                if(resp.result === "success"){
-                    location.reload();
+        if(this.platform === "ACAPP"){
+            this.root.AcWingOS.api.window.close();
+        } else{
+            $.ajax({
+                url: "http://59.110.53.20:8000/settings/logout/",
+                type: "GET",
+                success: function(resp) {
+                    console.log(resp);
+                    if(resp.result === "success"){
+                        location.reload();
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
     get_info(){

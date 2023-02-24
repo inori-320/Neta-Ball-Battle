@@ -11,7 +11,7 @@ class GameObject{
 
     create_uid(){
         let outer = this;
-        let res = ""l;
+        let res = "";
         for(let i = 0; i < 8; i ++){
             let x = parseInt(Math.floor(Math.random() * 10));
             res += x;

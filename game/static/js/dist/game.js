@@ -71,7 +71,7 @@ class GameObject{
 
     create_uid(){
         let outer = this;
-        let res = ""l;
+        let res = "";
         for(let i = 0; i < 8; i ++){
             let x = parseInt(Math.floor(Math.random() * 10));
             res += x;
@@ -242,7 +242,13 @@ class Player extends GameObject {
             const rect = outer.ctx.canvas.getBoundingClientRect();
             if(outer.alive){
                 if (tmp.which === 3) {
-                    outer.move((tmp.clientX - rect.left) / outer.playground.scale, (tmp.clientY - rect.top) / outer.playground.scale);
+                    let tx = (tmp.clientX - rect.left) / outer.playground.scale;
+                    let ty = (tmp.clientY - rect.top) / outer.playground.scale;
+                    outer.move(tx, ty);
+
+                    if(outer.playground.mode === "multi mode"){
+                        outer.playground.mps.send_move(tx, ty);
+                    }
                 } else if (tmp.which === 1){
                     if(outer.cur_skill === "fireball"){
                         outer.shoot_ball(outer.cur_skill, (tmp.clientX - rect.left) / outer.playground.scale, (tmp.clientY - rect.top) / outer.playground.scale);
@@ -466,8 +472,19 @@ class MultiPlayer{
             if(uid === outer.uid) return false;
             if (event === "create_player"){
                 outer.receive_create_player(uid, data.username, data.photo);
+            } else if (event === "move"){
+                outer.receive_move(uid, data.tx, data.ty);
             }
         }
+    }
+
+    get_player(uid){
+        let players = this.playground.players;
+        for (let i = 0; i < players.length(); i++){
+            let player = players[i];
+            if(player.uid === uid) return player;
+        }
+        return null;
     }
 
     send_create_player(username, photo){
@@ -497,7 +514,23 @@ class MultiPlayer{
         this.playground.players.push(player);
     }
 
-}
+    send_move(tx, ty){
+        let outer = this;
+        this.ws.send(JSON.stringify({
+            'event': "move",
+            'uid': outer.uid,
+            'tx':tx,
+            'ty': ty,
+        }));
+    }
+
+    receive_move(uid, tx, ty){
+        let outer = this;
+        let player = this.get_player(uid);
+        if(player){
+            player.move(tx, ty);
+        }
+    }
 class GamePlayground{
     constructor(root){
         this.root = root;
@@ -540,6 +573,7 @@ class GamePlayground{
         this.width = this.$playground.width();
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
+        this.mode = mode;
         this.resize();
 
         this.players = [];
@@ -761,16 +795,20 @@ class GameSettings{
     }
 
     remote_logout(){
-        $.ajax({
-            url: "http://59.110.53.20:8000/settings/logout/",
-            type: "GET",
-            success: function(resp) {
-                console.log(resp);
-                if(resp.result === "success"){
-                    location.reload();
+        if(this.platform === "ACAPP"){
+            this.root.AcWingOS.api.window.close();
+        } else{
+            $.ajax({
+                url: "http://59.110.53.20:8000/settings/logout/",
+                type: "GET",
+                success: function(resp) {
+                    console.log(resp);
+                    if(resp.result === "success"){
+                        location.reload();
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
     get_info(){

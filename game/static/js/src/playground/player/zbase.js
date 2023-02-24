@@ -49,7 +49,13 @@ class Player extends GameObject {
             const rect = outer.ctx.canvas.getBoundingClientRect();
             if(outer.alive){
                 if (tmp.which === 3) {
-                    outer.move((tmp.clientX - rect.left) / outer.playground.scale, (tmp.clientY - rect.top) / outer.playground.scale);
+                    let tx = (tmp.clientX - rect.left) / outer.playground.scale;
+                    let ty = (tmp.clientY - rect.top) / outer.playground.scale;
+                    outer.move(tx, ty);
+
+                    if(outer.playground.mode === "multi mode"){
+                        outer.playground.mps.send_move(tx, ty);
+                    }
                 } else if (tmp.which === 1){
                     if(outer.cur_skill === "fireball"){
                         outer.shoot_ball(outer.cur_skill, (tmp.clientX - rect.left) / outer.playground.scale, (tmp.clientY - rect.top) / outer.playground.scale);
