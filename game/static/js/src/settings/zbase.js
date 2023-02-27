@@ -29,7 +29,7 @@ class GameSettings{
         </div>
         <br>
         <div class = "game_settings_qq">
-            <img width = "40" src = "http://59.110.53.20:8000/static/image/settings/qq_logo.png">
+            <img width = "40" src = "https://app4634.acapp.acwing.com.cn/static/image/settings/qq_logo.png">
             <br>
             <div class = "game_settings_qq_title">
                 QQ一键登录
@@ -67,7 +67,7 @@ class GameSettings{
         </div>
         <br>
         <div class = "game_settings_qq">
-            <img width = "40" src = "http://59.110.53.20:8000/static/image/settings/qq_logo.png">
+            <img width = "40" src = "https://app4634.acapp.acwing.com.cn/static/image/settings/qq_logo.png">
             <br>
             <div class = "game_settings_qq_title">
                 QQ一键注册
@@ -98,6 +98,7 @@ class GameSettings{
 
         this.root.$lty.append(this.$settings);
         this.platform = "WEB";
+        if(this.root.AcWingOS) this.platform = "ACAPP";
         this.username = "";
         this.photo = "";
 
@@ -152,7 +153,7 @@ class GameSettings{
         this.$login_error.empty();
         console.log(username, passwd);
         $.ajax({
-            url: "http://59.110.53.20:8000/settings/login/",
+            url: "https://app4634.acapp.acwing.com.cn/settings/login/",
             type: "GET",
             data: {
                 username: username,
@@ -177,7 +178,7 @@ class GameSettings{
         this.$register_error.empty();
 
         $.ajax({
-            url:"http://59.110.53.20:8000/settings/register/",
+            url:"https://app4634.acapp.acwing.com.cn/settings/register/",
             type: "GET",
             data:{
                 username: username,
@@ -201,7 +202,7 @@ class GameSettings{
             this.root.AcWingOS.api.window.close();
         } else{
             $.ajax({
-                url: "http://59.110.53.20:8000/settings/logout/",
+                url: "https://app4634.acapp.acwing.com.cn/settings/logout/",
                 type: "GET",
                 success: function(resp) {
                     console.log(resp);
@@ -216,7 +217,7 @@ class GameSettings{
     get_info(){
         let outer = this;
         $.ajax({
-            url: "http://59.110.53.20:8000/settings/getinfo/",
+            url: "https://app4634.acapp.acwing.com.cn/settings/getinfo/",
             type: "GET",
             data: {
                 platform: outer.platform,
