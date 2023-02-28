@@ -28,11 +28,11 @@ class GameSettings{
             注册
         </div>
         <br>
-        <div class = "game_settings_qq">
-            <img width = "40" src = "https://app4634.acapp.acwing.com.cn/static/image/settings/qq_logo.png">
+        <div class = "game_settings_acwing">
+            <img width = "40" src = "https://app4634.acapp.acwing.com.cn/static/image/settings/acwing.png">
             <br>
-            <div class = "game_settings_qq_title">
-                QQ一键登录
+            <div class = "game_settings_acwing_title">
+                ACWing一键登录
             </div>
         </div>
     </div>
@@ -66,11 +66,11 @@ class GameSettings{
             登录
         </div>
         <br>
-        <div class = "game_settings_qq">
-            <img width = "40" src = "https://app4634.acapp.acwing.com.cn/static/image/settings/qq_logo.png">
+        <div class = "game_settings_acwing">
+            <img width = "40" src = "https://app4634.acapp.acwing.com.cn/static/image/settings/acwing.png">
             <br>
-            <div class = "game_settings_qq_title">
-                QQ一键注册
+            <div class = "game_settings_acwing_title">
+                ACWing一键注册
             </div>
         </div>
     </div>
@@ -96,8 +96,11 @@ class GameSettings{
 
         this.$register.hide();
 
+        this.$acwing_login = this.$settings.find('.game_settings_acwing img');
+
         this.root.$lty.append(this.$settings);
         this.platform = "WEB";
+        if(this.root.AcWingOS) this.platform = "ACAPP";
         this.username = "";
         this.photo = "";
 
@@ -113,6 +116,10 @@ class GameSettings{
         let outer = this;
         this.listening_events_login();
         this.listening_events_register();
+
+        this.$acwing_login.click(function(){
+            outer.acwing_login();
+        })
     }
 
     listening_events_login(){
@@ -143,6 +150,19 @@ class GameSettings{
     login(){
         this.$register.hide();
         this.$login.show();
+    }
+
+    acwing_login(){
+        $.ajax({
+            url:"https://app4634.acapp.acwing.com.cn/settings/acwing/web/apply_code/",
+            type: "GET",
+            success: function(resp){
+                console.log(resp);
+                if(resp.result === "success") {
+                    window.location.replace(resp.apply_code_url);
+                }
+            }
+        });
     }
 
     remote_login(){

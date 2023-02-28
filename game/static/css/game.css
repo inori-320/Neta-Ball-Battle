@@ -148,12 +148,12 @@
     cursor: pointer;
 }
 
-.game_settings_qq{
+.game_settings_acwing{
     display: block;
     height: 10vh;
 }
 
-.game_settings_qq > img {
+.game_settings_acwing > img {
     position: relative;
     top: 50%;
     left: 50%;
@@ -161,7 +161,7 @@
     cursor: pointer;
 }
 
-.game_settings_qq_title{
+.game_settings_acwing_title{
     font-size: 2vh;
     color: white;
     text-align: center;
