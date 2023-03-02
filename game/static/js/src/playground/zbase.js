@@ -13,9 +13,25 @@ class GamePlayground{
 
     start(){
         let outer = this;
-        $(window).resize(function() {
+        let uid = this.create_uid();
+        $(window).on(`resize.${uid}`, function(){
             outer.resize();
         });
+
+        if(this.root.AcWingOS) {
+            this.root.AcWingOS.api.window.on_close(function() {
+                $(window).off(`resize.${uid}`);
+            });
+        }
+    }
+
+    create_uid(){
+        let ans = "";
+        for(let i = 0; i < 8; i++){
+            let x = parseInt(Math.floor(Math.random() * 10 ));
+            ans += x;
+        }
+        return ans;
     }
 
     resize(){

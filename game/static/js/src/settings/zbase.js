@@ -1,6 +1,11 @@
 class GameSettings{
     constructor(root){
         this.root = root;
+        this.platform = "WEB";
+        if (this.root.AcWingOS) this.platform = "ACAPP";
+        this.username = "";
+        this.photo = "";
+
         this.$settings = $(`
 <div class = "game_settings">
     <div class = "game_settings_login">
@@ -99,17 +104,17 @@ class GameSettings{
         this.$acwing_login = this.$settings.find('.game_settings_acwing img');
 
         this.root.$lty.append(this.$settings);
-        this.platform = "WEB";
-        if(this.root.AcWingOS) this.platform = "ACAPP";
-        this.username = "";
-        this.photo = "";
 
         this.start();
     }
 
     start(){
-        this.get_info();
-        this.listening_events();
+        if(this.platform === "ACAPP"){
+            this.getinfo_acapp();
+        } else {
+            this.getinfo_web();
+            this.listening_events();
+        }
     }
 
     listening_events(){
@@ -213,7 +218,7 @@ class GameSettings{
                 }
             }
 
-        })
+        });
     }
 
     remote_logout(){
@@ -229,11 +234,37 @@ class GameSettings{
                         location.reload();
                     }
                 }
-            })
+            });
         }
     }
 
-    get_info(){
+    acapp_login(appid, redirect_uri, scope, state){
+        let outer = this;
+        this.root.AcWingOS.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp){
+            console.log(resp);
+            if(resp.result === "success"){
+                outer.username = resp.username;
+                outer.photo = resp.photo;
+                outer.hide();
+                outer.root.menu.show();
+            }
+        });
+    }
+
+    getinfo_acapp(){
+        let outer = this;
+        $.ajax({
+            url: "https://app4634.acapp.acwing.com.cn/settings/acwing/acapp/apply_code/",
+            type: "GET",
+            success: function(resp){
+                if(resp.result === "success"){
+                    outer.acapp_login(resp.appid, resp.redirect_uri, resp.scope, resp.state);
+                }
+            }
+        });
+    }
+
+    getinfo_web(){
         let outer = this;
         $.ajax({
             url: "https://app4634.acapp.acwing.com.cn/settings/getinfo/",
