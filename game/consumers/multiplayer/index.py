@@ -8,7 +8,8 @@ class MultiPlayer(AsyncWebsocketConsumer):
         self.room_name = None
 
         for i in range(1000):
-            if not cachre.has_key(name) or len(cache.get(name)) < settings.Room_Capacity:
+            name = "room_%d" % (i)
+            if not cache.has_key(name) or len(cache.get(name)) < 3:
                 self.room_name = name
                 break
 
@@ -16,6 +17,7 @@ class MultiPlayer(AsyncWebsocketConsumer):
             return
 
         await self.accept()
+        print("accept")
 
         if not cache.has_key(self.room_name):
             cache.set(self.room_name, [], 1800)
@@ -59,7 +61,7 @@ class MultiPlayer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
                 self.room_name,
                 {
-                    'type': "gounp_send_event",
+                    'type': "group_send_event",
                     'event': "move",
                     'uid': data['uid'],
                     'tx': data['tx'],
@@ -73,4 +75,4 @@ class MultiPlayer(AsyncWebsocketConsumer):
         if event == "create_player":
             await self.create_player(data)
         elif event == "move":
-            await self.move_to(data)
+            await self.move(data)

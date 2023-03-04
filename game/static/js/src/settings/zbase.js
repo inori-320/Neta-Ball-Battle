@@ -162,7 +162,6 @@ class GameSettings{
             url:"https://app4634.acapp.acwing.com.cn/settings/acwing/web/apply_code/",
             type: "GET",
             success: function(resp){
-                console.log(resp);
                 if(resp.result === "success") {
                     window.location.replace(resp.apply_code_url);
                 }
@@ -175,7 +174,6 @@ class GameSettings{
         let username = this.$login_username.val();
         let passwd = this.$login_passwd.val();
         this.$login_error.empty();
-        console.log(username, passwd);
         $.ajax({
             url: "https://app4634.acapp.acwing.com.cn/settings/login/",
             type: "GET",
@@ -184,7 +182,6 @@ class GameSettings{
                 password: passwd,
             },
             success: function(resp){
-                console.log(resp);
                 if(resp.result === "success"){
                     location.reload();
                 } else {
@@ -210,7 +207,6 @@ class GameSettings{
                 passwd_2: passwd_2,
             },
             success: function(resp){
-                console.log(resp);
                 if(resp.result == "success"){
                     outer.login();
                 } else {
@@ -229,7 +225,6 @@ class GameSettings{
                 url: "https://app4634.acapp.acwing.com.cn/settings/logout/",
                 type: "GET",
                 success: function(resp) {
-                    console.log(resp);
                     if(resp.result === "success"){
                         location.reload();
                     }
@@ -241,7 +236,6 @@ class GameSettings{
     acapp_login(appid, redirect_uri, scope, state){
         let outer = this;
         this.root.AcWingOS.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp){
-            console.log(resp);
             if(resp.result === "success"){
                 outer.username = resp.username;
                 outer.photo = resp.photo;
@@ -273,7 +267,6 @@ class GameSettings{
                 platform: outer.platform,
             },
             success: function(resp){
-                console.log(resp);
                 if(resp.result === "success"){
                     outer.username = resp.username;
                     outer.photo = resp.photo;

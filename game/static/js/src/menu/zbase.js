@@ -32,21 +32,21 @@ class GameMenu{
     }
 
     add_listening_events(){
-        let now_menu = this;
+        let outer = this;
         this.$single.click(function(){
             console.log("click single mode.");
-            now_menu.hide();
-            now_menu.root.playground.show("single mode");
+            outer.hide();
+            outer.root.playground.show("single mode");
         });
         this.$multi.click(function(){
             console.log("click multi mode.");
-            now_menu.hide();
-            now_menu.root.playground.show("multi mode");
+            outer.hide();
+            outer.root.playground.show("multi mode");
 
         });
         this.$settings.click(function(){
             console.log("launch setting.");
-            now_menu.root.settings.remote_logout();
+            outer.root.settings.remote_logout();
         });
     }
 

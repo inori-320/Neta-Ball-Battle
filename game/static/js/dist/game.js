@@ -32,21 +32,21 @@ class GameMenu{
     }
 
     add_listening_events(){
-        let now_menu = this;
+        let outer = this;
         this.$single.click(function(){
             console.log("click single mode.");
-            now_menu.hide();
-            now_menu.root.playground.show("single mode");
+            outer.hide();
+            outer.root.playground.show("single mode");
         });
         this.$multi.click(function(){
             console.log("click multi mode.");
-            now_menu.hide();
-            now_menu.root.playground.show("multi mode");
+            outer.hide();
+            outer.root.playground.show("multi mode");
 
         });
         this.$settings.click(function(){
             console.log("launch setting.");
-            now_menu.root.settings.remote_logout();
+            outer.root.settings.remote_logout();
         });
     }
 
@@ -454,7 +454,7 @@ class MultiPlayer{
     constructor(playground){
         this.playground = playground;
 
-        this.ws = new WebSocket("wss://8.130.15.181:8000/wss/multiplayer/");
+        this.ws = new WebSocket("wss://app4634.acapp.acwing.com.cn/wss/multiplayer/");
 
         this.start();
     }
@@ -480,7 +480,7 @@ class MultiPlayer{
 
     get_player(uid){
         let players = this.playground.players;
-        for (let i = 0; i < players.length(); i++){
+        for (let i = 0; i < players.length; i++){
             let player = players[i];
             if(player.uid === uid) return player;
         }
@@ -777,7 +777,6 @@ class GameSettings{
             url:"https://app4634.acapp.acwing.com.cn/settings/acwing/web/apply_code/",
             type: "GET",
             success: function(resp){
-                console.log(resp);
                 if(resp.result === "success") {
                     window.location.replace(resp.apply_code_url);
                 }
@@ -790,7 +789,6 @@ class GameSettings{
         let username = this.$login_username.val();
         let passwd = this.$login_passwd.val();
         this.$login_error.empty();
-        console.log(username, passwd);
         $.ajax({
             url: "https://app4634.acapp.acwing.com.cn/settings/login/",
             type: "GET",
@@ -799,7 +797,6 @@ class GameSettings{
                 password: passwd,
             },
             success: function(resp){
-                console.log(resp);
                 if(resp.result === "success"){
                     location.reload();
                 } else {
@@ -825,7 +822,6 @@ class GameSettings{
                 passwd_2: passwd_2,
             },
             success: function(resp){
-                console.log(resp);
                 if(resp.result == "success"){
                     outer.login();
                 } else {
@@ -844,7 +840,6 @@ class GameSettings{
                 url: "https://app4634.acapp.acwing.com.cn/settings/logout/",
                 type: "GET",
                 success: function(resp) {
-                    console.log(resp);
                     if(resp.result === "success"){
                         location.reload();
                     }
@@ -856,7 +851,6 @@ class GameSettings{
     acapp_login(appid, redirect_uri, scope, state){
         let outer = this;
         this.root.AcWingOS.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp){
-            console.log(resp);
             if(resp.result === "success"){
                 outer.username = resp.username;
                 outer.photo = resp.photo;
@@ -888,7 +882,6 @@ class GameSettings{
                 platform: outer.platform,
             },
             success: function(resp){
-                console.log(resp);
                 if(resp.result === "success"){
                     outer.username = resp.username;
                     outer.photo = resp.photo;

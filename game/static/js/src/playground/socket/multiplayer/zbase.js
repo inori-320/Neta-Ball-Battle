@@ -2,7 +2,7 @@ class MultiPlayer{
     constructor(playground){
         this.playground = playground;
 
-        this.ws = new WebSocket("wss://8.130.15.181:8000/wss/multiplayer/");
+        this.ws = new WebSocket("wss://app4634.acapp.acwing.com.cn/wss/multiplayer/");
 
         this.start();
     }
@@ -28,7 +28,7 @@ class MultiPlayer{
 
     get_player(uid){
         let players = this.playground.players;
-        for (let i = 0; i < players.length(); i++){
+        for (let i = 0; i < players.length; i++){
             let player = players[i];
             if(player.uid === uid) return player;
         }
