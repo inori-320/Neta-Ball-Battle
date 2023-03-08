@@ -8,10 +8,10 @@ class MultiPlayer{
     }
 
     start(){
-        this.handle_receive();
+        this.receive();
     }
 
-    handle_receive(){
+    receive(){
         let outer = this;
         this.ws.onmessage = function(s) {
             let data = JSON.parse(s.data);
@@ -22,6 +22,8 @@ class MultiPlayer{
                 outer.receive_create_player(uid, data.username, data.photo);
             } else if (event === "move"){
                 outer.receive_move(uid, data.tx, data.ty);
+            } else if (event === "shoot_ball"){
+                outer.receive_shoot_ball(uid, data.tx, data.ty, data.ball_uid);
             }
         }
     }
@@ -77,6 +79,26 @@ class MultiPlayer{
         let player = this.get_player(uid);
         if(player){
             player.move(tx, ty);
+        }
+    }
+
+    send_shoot_ball(tx, ty, ball_uid){
+        let outer = this;
+        this.ws.send(JSON.stringify({
+            'event': "shoot_ball",
+            'uid': outer.uid,
+            'tx': tx,
+            'ty':ty,
+            'ball_uid': ball_uid,
+        }));
+    }
+
+    receive_shoot_ball(uid, tx, ty, ball_uid){
+        let outer = this;
+        let player = this.get_player(uid);
+        if(player){
+            let ball = player.shoot_ball(tx, ty);
+            ball.uid = ball_uid;
         }
     }
 }

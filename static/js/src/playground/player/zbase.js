@@ -22,6 +22,7 @@ class Player extends GameObject {
         this.cold_time = 0;
         this.friction = 0.7;
         this.alive = true;
+        this.fireballs = [];
 
         if(character !== "robot"){
             this.img = new Image();
@@ -57,8 +58,13 @@ class Player extends GameObject {
                         outer.playground.mps.send_move(tx, ty);
                     }
                 } else if (tmp.which === 1){
+                    let tx = (tmp.clientX - rect.left) / outer.playground.scale;
+                    let ty = (tmp.clientY - rect.top) / outer.playground.scale;
                     if(outer.cur_skill === "fireball"){
-                        outer.shoot_ball(outer.cur_skill, (tmp.clientX - rect.left) / outer.playground.scale, (tmp.clientY - rect.top) / outer.playground.scale);
+                        let fireball = outer.shoot_ball(outer.cur_skill, tx, ty);
+                        if(outer.playground.mode === "multi mode"){
+                            outer.playground.mps.send_shoot_ball(tx, ty, fireball.uid);
+                        }
                     }
                     outer.cur_skill = null;
                 }
@@ -84,7 +90,19 @@ class Player extends GameObject {
             let color = "orange";
             let speed = 0.5;
             let move_length = 0.8;
-            new FireBall(this.playground, this, x, y, r, vx, vy, color, speed, move_length, 0.01);
+            let fireball = new FireBall(this.playground, this, x, y, r, vx, vy, color, speed, move_length, 0.01);
+            this.fireballs.push(fireball);
+            return fireball;
+        }
+    }
+
+    destory_fireball(uid){
+        for(let i = 0; i < this.fireballs.length; i++){
+            let fireball = this.fireballs[i];
+            if(fireball.uid === uid){
+                fireball.destory();
+                break;
+            }
         }
     }
 
@@ -184,6 +202,7 @@ class Player extends GameObject {
         for(let i = 0; i < this.playground.players.length; i++){
             if(this.playground.players[i] === this){
                 this.playground.players.splice(i, 1);
+                break;
             }
         }
     }
