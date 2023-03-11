@@ -214,7 +214,6 @@ class Player extends GameObject {
         this.cur_skill = null;
         this.cold_time = 0;
         this.friction = 0.7;
-        this.alive = true;
         this.fireballs = [];
 
         if(character !== "robot"){
@@ -241,35 +240,33 @@ class Player extends GameObject {
         })
         this.playground.game_map.$canvas.mousedown(function(tmp) {
             const rect = outer.ctx.canvas.getBoundingClientRect();
-            if(outer.alive){
-                if (tmp.which === 3) {
-                    let tx = (tmp.clientX - rect.left) / outer.playground.scale;
-                    let ty = (tmp.clientY - rect.top) / outer.playground.scale;
-                    outer.move(tx, ty);
+            if (tmp.which === 3) {
+                let tx = (tmp.clientX - rect.left) / outer.playground.scale;
+                let ty = (tmp.clientY - rect.top) / outer.playground.scale;
+                outer.move(tx, ty);
 
-                    if(outer.playground.mode === "multi mode"){
-                        outer.playground.mps.send_move(tx, ty);
-                    }
-                } else if (tmp.which === 1){
-                    let tx = (tmp.clientX - rect.left) / outer.playground.scale;
-                    let ty = (tmp.clientY - rect.top) / outer.playground.scale;
-                    if(outer.cur_skill === "fireball"){
-                        let fireball = outer.shoot_ball(outer.cur_skill, tx, ty);
-                        if(outer.playground.mode === "multi mode"){
-                            outer.playground.mps.send_shoot_ball(tx, ty, fireball.uid);
-                        }
-                    }
-                    outer.cur_skill = null;
+                if(outer.playground.mode === "multi mode"){
+                    outer.playground.mps.send_move(tx, ty);
                 }
+            } else if (tmp.which === 1){
+                let tx = (tmp.clientX - rect.left) / outer.playground.scale;
+                let ty = (tmp.clientY - rect.top) / outer.playground.scale;
+                if(outer.cur_skill === "fireball"){
+                    let fireball = outer.shoot_ball(outer.cur_skill, tx, ty);
+                    if(outer.playground.mode === "multi mode"){
+                        outer.playground.mps.send_shoot_fireball(tx, ty, fireball.uid);
+                    }
+                }
+                outer.cur_skill = null;
             }
         });
 
         $(window).keydown(function(tmp) {
-                if (tmp.which === 81){           //表示Q键，详见keycode对照表
-                    outer.cur_skill = "fireball";
-                    return false;
-                }
-            });
+            if (tmp.which === 81){           //表示Q键，详见keycode对照表
+                outer.cur_skill = "fireball";
+                return false;
+            }
+        });
     }
 
     shoot_ball(cur, tx, ty){
@@ -328,7 +325,6 @@ class Player extends GameObject {
         this.r -= damage;
         if (this.r < this.eps){
             this.del();
-            this.alive = false;
             return false;
         } else {
             this.damvx = Math.cos(angle);
@@ -504,15 +500,17 @@ class MultiPlayer{
         let outer = this;
         this.ws.onmessage = function(s) {
             let data = JSON.parse(s.data);
+            console.log(data);
             let event = data.event;
             let uid = data.uid;
-            if(uid === outer.uid) return false;
+            console.log("aa");
+            // if(uid === outer.uid) return false;
             if (event === "create_player"){
                 outer.receive_create_player(uid, data.username, data.photo);
             } else if (event === "move"){
                 outer.receive_move(uid, data.tx, data.ty);
-            } else if (event === "shoot_ball"){
-                outer.receive_shoot_ball(uid, data.tx, data.ty, data.ball_uid);
+            } else if (event === "shoot_fireball"){
+                outer.receive_shoot_fireball(uid, data.tx, data.ty, data.ball_uid);
             }
         }
     }
@@ -571,10 +569,10 @@ class MultiPlayer{
         }
     }
 
-    send_shoot_ball(tx, ty, ball_uid){
+    send_shoot_fireball(tx, ty, ball_uid){
         let outer = this;
         this.ws.send(JSON.stringify({
-            'event': "shoot_ball",
+            'event': "shoot_fireball",
             'uid': outer.uid,
             'tx': tx,
             'ty':ty,
@@ -582,11 +580,11 @@ class MultiPlayer{
         }));
     }
 
-    receive_shoot_ball(uid, tx, ty, ball_uid){
+    receive_shoot_fireball(uid, tx, ty, ball_uid){
         let outer = this;
         let player = this.get_player(uid);
         if(player){
-            let ball = player.shoot_ball(tx, ty);
+            let ball = player.shoot_ball("fireball", tx, ty);
             ball.uid = ball_uid;
         }
     }

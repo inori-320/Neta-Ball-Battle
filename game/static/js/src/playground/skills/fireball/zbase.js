@@ -25,6 +25,10 @@ class FireBall extends GameObject {
             return false;
         }
         this.update_move();
+
+        if(this.player.character !== "enemy"){
+            this.update_attack();
+        }
         this.update_attack();
 
         this.render();

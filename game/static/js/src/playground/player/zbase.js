@@ -21,7 +21,6 @@ class Player extends GameObject {
         this.cur_skill = null;
         this.cold_time = 0;
         this.friction = 0.7;
-        this.alive = true;
         this.fireballs = [];
 
         if(character !== "robot"){
@@ -48,35 +47,33 @@ class Player extends GameObject {
         })
         this.playground.game_map.$canvas.mousedown(function(tmp) {
             const rect = outer.ctx.canvas.getBoundingClientRect();
-            if(outer.alive){
-                if (tmp.which === 3) {
-                    let tx = (tmp.clientX - rect.left) / outer.playground.scale;
-                    let ty = (tmp.clientY - rect.top) / outer.playground.scale;
-                    outer.move(tx, ty);
+            if (tmp.which === 3) {
+                let tx = (tmp.clientX - rect.left) / outer.playground.scale;
+                let ty = (tmp.clientY - rect.top) / outer.playground.scale;
+                outer.move(tx, ty);
 
-                    if(outer.playground.mode === "multi mode"){
-                        outer.playground.mps.send_move(tx, ty);
-                    }
-                } else if (tmp.which === 1){
-                    let tx = (tmp.clientX - rect.left) / outer.playground.scale;
-                    let ty = (tmp.clientY - rect.top) / outer.playground.scale;
-                    if(outer.cur_skill === "fireball"){
-                        let fireball = outer.shoot_ball(outer.cur_skill, tx, ty);
-                        if(outer.playground.mode === "multi mode"){
-                            outer.playground.mps.send_shoot_ball(tx, ty, fireball.uid);
-                        }
-                    }
-                    outer.cur_skill = null;
+                if(outer.playground.mode === "multi mode"){
+                    outer.playground.mps.send_move(tx, ty);
                 }
+            } else if (tmp.which === 1){
+                let tx = (tmp.clientX - rect.left) / outer.playground.scale;
+                let ty = (tmp.clientY - rect.top) / outer.playground.scale;
+                if(outer.cur_skill === "fireball"){
+                    let fireball = outer.shoot_ball("fireball", tx, ty);
+                    if(outer.playground.mode === "multi mode"){
+                        outer.playground.mps.send_shoot_fireball(tx, ty, fireball.uid);
+                    }
+                }
+                outer.cur_skill = null;
             }
         });
 
         $(window).keydown(function(tmp) {
-                if (tmp.which === 81){           //表示Q键，详见keycode对照表
-                    outer.cur_skill = "fireball";
-                    return false;
-                }
-            });
+            if (tmp.which === 81){           //表示Q键，详见keycode对照表
+                outer.cur_skill = "fireball";
+                return false;
+            }
+        });
     }
 
     shoot_ball(cur, tx, ty){
@@ -135,7 +132,6 @@ class Player extends GameObject {
         this.r -= damage;
         if (this.r < this.eps){
             this.del();
-            this.alive = false;
             return false;
         } else {
             this.damvx = Math.cos(angle);
@@ -143,6 +139,13 @@ class Player extends GameObject {
             this.damspeed = damage * 70;
             this.speed *= 1.2;
         }
+    }
+
+    receive_attack(x, y, angle, damage, ball_uid, attacker){
+        attacker.destory_fireball(ball_uid);
+        this.x = x;
+        this.y = y;
+        this.attacked(angle, damage);
     }
 
     update(){
