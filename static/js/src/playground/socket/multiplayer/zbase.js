@@ -27,6 +27,8 @@ class MultiPlayer{
                 outer.receive_shoot_fireball(uid, data.tx, data.ty, data.ball_uid);
             } else if (event === "attack"){
                 outer.receive_attack(uid, data.attackee_uid, data.x, data.y, data.angle, data.damage, data.ball_uid);
+            } else if (event === "blink"){
+                outer.receive_blink(uid, data.tx, data.ty);
             }
         }
     }
@@ -92,7 +94,7 @@ class MultiPlayer{
             'uid': outer.uid,
             'tx': tx,
             'ty':ty,
-            'ball_uid': ball_uid,
+            'ball_uid': ball_uid
         }));
     }
 
@@ -115,7 +117,7 @@ class MultiPlayer{
             'y': y,
             'angle': angle,
             'damage': damage,
-            'ball_uid': ball_uid,
+            'ball_uid': ball_uid
         }));
     }
 
@@ -124,6 +126,23 @@ class MultiPlayer{
         let attackee = this.get_player(attackee_uid);
         if(attacker && attackee){
             attackee.receive_attack(x, y, angle, damage, ball_uid, attacker);
+        }
+    }
+
+    send_blink(tx, ty){
+        let over = this;
+        this.ws.send(JSON.stringify({
+            'event': "blink",
+            'uid': outer.uid,
+            'tx': tx,
+            'ty': ty
+        }));
+    }
+
+    receive_blink(uid, tx, ty){
+        let player = this.get_player(uid);
+        if(player){
+            player.blink(tx, ty);
         }
     }
 }
