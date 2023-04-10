@@ -18,14 +18,15 @@ class MultiPlayer{
             console.log(data);
             let event = data.event;
             let uid = data.uid;
-            console.log("aa");
-            // if(uid === outer.uid) return false;
+            if(uid === outer.uid) return false;
             if (event === "create_player"){
                 outer.receive_create_player(uid, data.username, data.photo);
             } else if (event === "move"){
                 outer.receive_move(uid, data.tx, data.ty);
             } else if (event === "shoot_fireball"){
                 outer.receive_shoot_fireball(uid, data.tx, data.ty, data.ball_uid);
+            } else if (event === "attack"){
+                outer.receive_attack(uid, data.attackee_uid, data.x, data.y, data.angle, data.damage, data.ball_uid);
             }
         }
     }
@@ -101,6 +102,28 @@ class MultiPlayer{
         if(player){
             let ball = player.shoot_ball("fireball", tx, ty);
             ball.uid = ball_uid;
+        }
+    }
+
+    send_attack(attackee_uid, x, y, angle, damage, ball_uid){
+        let outer = this;
+        this.ws.send(JSON.stringify({
+            'event': "attack",
+            'uid': outer.uid,
+            'attackee_uid': attackee_uid,
+            'x': x,
+            'y': y,
+            'angle': angle,
+            'damage': damage,
+            'ball_uid': ball_uid,
+        }));
+    }
+
+    receive_attack(uid, attackee_uid, x, y, angle, damage, ball_uid){
+        let attacker = this.get_player(uid);
+        let attackee = this.get_player(attackee_uid);
+        if(attacker && attackee){
+            attackee.receive_attack(x, y, angle, damage, ball_uid, attacker);
         }
     }
 }

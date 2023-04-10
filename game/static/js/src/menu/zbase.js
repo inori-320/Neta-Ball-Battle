@@ -34,18 +34,15 @@ class GameMenu{
     add_listening_events(){
         let outer = this;
         this.$single.click(function(){
-            console.log("click single mode.");
             outer.hide();
             outer.root.playground.show("single mode");
         });
         this.$multi.click(function(){
-            console.log("click multi mode.");
             outer.hide();
             outer.root.playground.show("multi mode");
 
         });
         this.$settings.click(function(){
-            console.log("launch setting.");
             outer.root.settings.remote_logout();
         });
     }

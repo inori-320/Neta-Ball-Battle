@@ -110,6 +110,7 @@ class MultiPlayer{
         this.ws.send(JSON.stringify({
             'event': "attack",
             'uid': outer.uid,
+            'attackee_uid': attackee_uid,
             'x': x,
             'y': y,
             'angle': angle,

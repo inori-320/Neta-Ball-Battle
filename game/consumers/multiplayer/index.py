@@ -80,6 +80,22 @@ class MultiPlayer(AsyncWebsocketConsumer):
                 }
             )
 
+    async def attack(self, data):
+        await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    'type': "group_send_event",
+                    'event': "attack",
+                    'uid': data['uid'],
+                    'attackee_uid': data['attackee_uid'],
+                    'x': data['x'],
+                    'y': data['y'],
+                    'angle': data['angle'],
+                    'damage': data['damage'],
+                    'ball_uid': data['ball_uid'],
+                }
+            )
+
     async def receive(self, text_data):
         data = json.loads(text_data)
         event = data['event']
@@ -89,3 +105,5 @@ class MultiPlayer(AsyncWebsocketConsumer):
             await self.move(data)
         elif event == "shoot_ball":
             await self.shoot_ball(data)
+        elif event == "attack":
+            await self.attack(data)
