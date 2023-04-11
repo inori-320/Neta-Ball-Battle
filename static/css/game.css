@@ -167,3 +167,32 @@
     text-align: center;
     padding-top: 3vh;
 }
+
+.chatfield_history{
+    position: absolute;
+    top: 66%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    width: 20%;
+    height: 32%;
+    color: white;
+    font-size: 2vh;
+    padding: 5px;
+    overflow: auto;
+}
+
+.chatfield_history::-webkit-scrollbar {
+    width: 0;
+}
+
+.chatfield_input{
+    position: absolute;
+    top: 86%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    width: 20%;
+    height: 3vh;
+    color: white;
+    font-size: 2vh;
+    background-color: rgba(222, 225, 230, 0.2);
+}

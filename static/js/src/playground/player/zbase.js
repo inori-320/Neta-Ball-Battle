@@ -63,7 +63,7 @@ class Player extends GameObject {
         })
         this.playground.game_map.$canvas.mousedown(function(tmp) {
             if(outer.playground.state !== "fighting"){
-                return false;
+                return true;
             }
             const rect = outer.ctx.canvas.getBoundingClientRect();
             if (tmp.which === 3) {
@@ -98,11 +98,17 @@ class Player extends GameObject {
             }
         });
 
-        $(window).keydown(function(tmp) {
-            if(outer.playground.state !== "fighting"){
-                return true;
+        this.playground.game_map.$canvas.keydown(function(tmp) {
+            if (tmp.which === 13){      //Enter
+                if(outer.playground.mode === "multi mode"){
+                    outer.playground.chat_field.show_input();
+                    return false;
+                }
+            } else if(tmp.which === 27){        //Esc
+                if(outer.playground.mode === "multi mode"){
+                    outer.playground.chat_field.hide_input();
+                }
             }
-
             if (tmp.which === 81){           //表示Q键，详见keycode对照表
                 if(outer.fireball_coldtime > outer.eps){
                     return true;

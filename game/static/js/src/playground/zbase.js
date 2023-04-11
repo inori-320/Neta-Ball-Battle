@@ -57,7 +57,6 @@ class GamePlayground{
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
         this.mode = mode;
-        this.mode = mode;
         this.state = "waiting";
         this.notice_board = new NoticeBoard(this);
         this.player_count = 0;
@@ -69,7 +68,8 @@ class GamePlayground{
             for(let i = 0; i < 5; i++){
                 this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), "robot"));
             }
-        } else {
+        } else if(mode === "multi mode"){
+            this.chat_field = new ChatField(this);
             this.mps = new MultiPlayer(this);
             this.mps.uid = this.players[0].uid;
 

@@ -15,7 +15,6 @@ class MultiPlayer{
         let outer = this;
         this.ws.onmessage = function(s) {
             let data = JSON.parse(s.data);
-            console.log(data);
             let event = data.event;
             let uid = data.uid;
             if(uid === outer.uid) return false;
@@ -29,6 +28,8 @@ class MultiPlayer{
                 outer.receive_attack(uid, data.attackee_uid, data.x, data.y, data.angle, data.damage, data.ball_uid);
             } else if (event === "blink"){
                 outer.receive_blink(uid, data.tx, data.ty);
+            } else if (event === "message"){
+                outer.receive_message(uid, data.username, data.text);
             }
         }
     }
@@ -130,7 +131,7 @@ class MultiPlayer{
     }
 
     send_blink(tx, ty){
-        let over = this;
+        let outer = this;
         this.ws.send(JSON.stringify({
             'event': "blink",
             'uid': outer.uid,
@@ -144,5 +145,19 @@ class MultiPlayer{
         if(player){
             player.blink(tx, ty);
         }
+    }
+
+    send_message(username, text){
+        let outer = this;
+        this.ws.send(JSON.stringify({
+            'event': "message",
+            'uid': outer.uid,
+            'username': username,
+            'text': text,
+        }));
+    }
+
+    receive_message(uid, username, text){
+        this.playground.chat_field.add_message(username, text);
     }
 }

@@ -120,7 +120,7 @@ class GameMap extends GameObject {
     constructor(playground){
         super();
         this.playground = playground;
-        this.$canvas = $(`<canvas></canvas>`);
+        this.$canvas = $(`<canvas tabindex = 0></canvas>`);
         this.ctx = this.$canvas[0].getContext('2d');
         this.ctx.canvas.width = this.playground.width;
         this.ctx.canvas.height = this.playground.height;
@@ -128,7 +128,7 @@ class GameMap extends GameObject {
     }
 
     start(){
-
+        this.$canvas.focus();
     }
 
     resize(){
@@ -280,7 +280,7 @@ class Player extends GameObject {
         })
         this.playground.game_map.$canvas.mousedown(function(tmp) {
             if(outer.playground.state !== "fighting"){
-                return false;
+                return true;
             }
             const rect = outer.ctx.canvas.getBoundingClientRect();
             if (tmp.which === 3) {
@@ -315,11 +315,17 @@ class Player extends GameObject {
             }
         });
 
-        $(window).keydown(function(tmp) {
-            if(outer.playground.state !== "fighting"){
-                return true;
+        this.playground.game_map.$canvas.keydown(function(tmp) {
+            if (tmp.which === 13){      //Enter
+                if(outer.playground.mode === "multi mode"){
+                    outer.playground.chat_field.show_input();
+                    return false;
+                }
+            } else if(tmp.which === 27){        //Esc
+                if(outer.playground.mode === "multi mode"){
+                    outer.playground.chat_field.hide_input();
+                }
             }
-
             if (tmp.which === 81){           //表示Q键，详见keycode对照表
                 if(outer.fireball_coldtime > outer.eps){
                     return true;
@@ -637,6 +643,79 @@ class FireBall extends GameObject {
         }
     }
 }
+class ChatField {
+    constructor(playground){
+        this.playground = playground;
+        this.$history = $(`<div class = "chatfield_history"></div>`);
+        this.$input = $(`<input type = "text" class = "chatfield_input">`);
+        this.func_id = null;
+
+        this.$history.hide();
+        this.$input.hide();
+
+        this.playground.$playground.append(this.$history);
+        this.playground.$playground.append(this.$input);
+
+        this.start();
+    }
+
+    start(){
+        this.listening_events();
+    }
+
+    listening_events(){
+        let outer = this;
+        this.$input.keydown(function(e){
+            if(e.which === 27){
+                outer.hide_input();
+                return false;
+            } else if (e.which === 13){     // Enter
+                let username = outer.playground.root.settings.username;
+                let text = outer.$input.val();
+                if(text){
+                    outer.$input.val("");
+                    outer.add_message(username, text);
+                    outer.playground.mps.send_message(username, text);
+                }
+                return false;
+            }
+        });
+    }
+
+    show_input(){
+        this.show_history();
+        this.$input.show();
+        this.$input.focus();
+    }
+
+    hide_input(){
+        this.$input.hide();
+        this.playground.game_map.$canvas.focus();
+    }
+
+    render_message(message){
+        return $(`<div>${message}</div>`);
+    }
+
+    add_message(username, text){
+        this.show_history();
+        let message = `[${username}]${text}`;
+        this.$history.append(this.render_message(message));
+        this.$history.scrollTop(this.$history[0].scrollHeight);
+    }
+
+    show_history(){
+        let outer = this;
+        this.$history.fadeIn();
+        if(this.func_id){
+            clearTimeout(this.func_id);
+        }
+        this.func_id = setTimeout(function(){
+            outer.$history.fadeOut();
+            outer.func_id = null;
+        }, 3000);
+    }
+}
 class MultiPlayer{
     constructor(playground){
         this.playground = playground;
@@ -654,7 +733,6 @@ class MultiPlayer{
         let outer = this;
         this.ws.onmessage = function(s) {
             let data = JSON.parse(s.data);
-            console.log(data);
             let event = data.event;
             let uid = data.uid;
             if(uid === outer.uid) return false;
@@ -668,6 +746,8 @@ class MultiPlayer{
                 outer.receive_attack(uid, data.attackee_uid, data.x, data.y, data.angle, data.damage, data.ball_uid);
             } else if (event === "blink"){
                 outer.receive_blink(uid, data.tx, data.ty);
+            } else if (event === "message"){
+                outer.receive_message(uid, data.username, data.text);
             }
         }
     }
@@ -769,7 +849,7 @@ class MultiPlayer{
     }
 
     send_blink(tx, ty){
-        let over = this;
+        let outer = this;
         this.ws.send(JSON.stringify({
             'event': "blink",
             'uid': outer.uid,
@@ -783,6 +863,20 @@ class MultiPlayer{
         if(player){
             player.blink(tx, ty);
         }
+    }
+
+    send_message(username, text){
+        let outer = this;
+        this.ws.send(JSON.stringify({
+            'event': "message",
+            'uid': outer.uid,
+            'username': username,
+            'text': text,
+        }));
+    }
+
+    receive_message(uid, username, text){
+        this.playground.chat_field.add_message(username, text);
     }
 }
 class GamePlayground{
@@ -844,7 +938,6 @@ class GamePlayground{
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
         this.mode = mode;
-        this.mode = mode;
         this.state = "waiting";
         this.notice_board = new NoticeBoard(this);
         this.player_count = 0;
@@ -856,7 +949,8 @@ class GamePlayground{
             for(let i = 0; i < 5; i++){
                 this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), "robot"));
             }
-        } else {
+        } else if(mode === "multi mode"){
+            this.chat_field = new ChatField(this);
             this.mps = new MultiPlayer(this);
             this.mps.uid = this.players[0].uid;
 
