@@ -19,10 +19,13 @@ class GameObject{
         return res;
     }
 
-    start(){
+    start(){    //只会在创建时执行一次
     }
 
-    update(){
+    late_update(){      // 在每一帧的最后执行一次
+    }
+
+    update(){   //每一帧均会执行一次
     }
 
     on_del(){
@@ -53,6 +56,12 @@ let Game_Animation = function(timestamp) {
             obj.update();
         }
     }
+
+    for(let i = 0; i < GAME_OBJECT.length; i++){
+        let obj = GAME_OBJECT[i];
+        obj.late_update();
+    }
+
     last_timestamp = timestamp;
 
     requestAnimationFrame(Game_Animation);

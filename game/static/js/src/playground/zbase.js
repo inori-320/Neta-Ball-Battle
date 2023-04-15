@@ -11,6 +11,15 @@ class GamePlayground{
         this.start();
     }
 
+    create_uid(){
+        let ans = "";
+        for(let i = 0; i < 8; i++){
+            let x = parseInt(Math.floor(Math.random() * 10));
+            ans += x;
+        }
+        return ans;
+    }
+
     start(){
         let outer = this;
         let uid = this.create_uid();
@@ -23,15 +32,6 @@ class GamePlayground{
                 $(window).off(`resize.${uid}`);
             });
         }
-    }
-
-    create_uid(){
-        let ans = "";
-        for(let i = 0; i < 8; i++){
-            let x = parseInt(Math.floor(Math.random() * 10 ));
-            ans += x;
-        }
-        return ans;
     }
 
     resize(){
@@ -59,6 +59,7 @@ class GamePlayground{
         this.mode = mode;
         this.state = "waiting";
         this.notice_board = new NoticeBoard(this);
+        this.score_board = new ScoreBoard(this);
         this.player_count = 0;
         this.resize();
 
