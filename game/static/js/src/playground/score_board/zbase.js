@@ -8,8 +8,8 @@ class ScoreBoard extends GameObject{
         this.win_img = new Image();
         this.lose_img = new Image();
 
-        this.win_img.src = "";
-        this.lose_img.src = "";
+        this.win_img.src = "https://app4634.acapp.acwing.com.cn/static/image/playground/win.png";
+        this.lose_img.src = "https://app4634.acapp.acwing.com.cn/static/image/playground/lose.png";
     }
 
     start(){

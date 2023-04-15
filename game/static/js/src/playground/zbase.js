@@ -76,11 +76,29 @@ class GamePlayground{
 
             this.mps.ws.onopen = function(){
                 outer.mps.send_create_player(outer.root.settings.username, outer.root.settings.photo);
-            }
+            };
         }
     }
 
-    hide(){
+    hide(){     // 关闭playground界面
+        while(this.players && this.players.length > 0){
+            this.players[0].del();
+        }
+
+        if(this.game_map){
+            this.game_map.del();
+            this.game_map = null;
+        }
+        if(this.notice_board){
+            this.notice_board.del();
+            this.notice_board = null;
+        }
+        if(this.score_board){
+            this.score_board.del();
+            this.score_board = null;
+        }
+        this.$playground.empty();
+
         this.$playground.hide();
     }
 }
