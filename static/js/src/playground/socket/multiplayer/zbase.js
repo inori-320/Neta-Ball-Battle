@@ -16,8 +16,10 @@ class MultiPlayer{
         this.ws.onmessage = function(s) {
             let data = JSON.parse(s.data);
             let event = data.event;
+            console.log(event);
             let uid = data.uid;
             if(uid === outer.uid) return false;
+
             if (event === "create_player"){
                 outer.receive_create_player(uid, data.username, data.photo);
             } else if (event === "move_to"){
@@ -31,14 +33,15 @@ class MultiPlayer{
             } else if (event === "message"){
                 outer.receive_message(uid, data.username, data.text);
             }
-        }
+        };
     }
 
     get_player(uid){
         let players = this.playground.players;
         for (let i = 0; i < players.length; i++){
             let player = players[i];
-            if(player.uid === uid) return player;
+            if(player.uid === uid)
+                return player;
         }
         return null;
     }
@@ -81,7 +84,6 @@ class MultiPlayer{
     }
 
     receive_move(uid, tx, ty){
-        let outer = this;
         let player = this.get_player(uid);
         if(player){
             player.move_to(tx, ty);
@@ -100,7 +102,6 @@ class MultiPlayer{
     }
 
     receive_shoot_fireball(uid, tx, ty, ball_uid){
-        let outer = this;
         let player = this.get_player(uid);
         if(player){
             let ball = player.shoot_ball("fireball", tx, ty);

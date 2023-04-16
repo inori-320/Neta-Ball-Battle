@@ -6,7 +6,7 @@ from thrift import Thrift
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
-from sys import stdin
+
 from match_system.src.match_server.match_service import Match
 from game.models.players.players import Player
 from channels.db import database_sync_to_async

@@ -287,7 +287,7 @@ class Player extends GameObject {
         let outer = this;
         this.playground.game_map.$canvas.on("contextmenu", function() {
             return false;
-        })
+        });
         this.playground.game_map.$canvas.mousedown(function(tmp) {
             if(outer.playground.state !== "fighting"){
                 return true;
