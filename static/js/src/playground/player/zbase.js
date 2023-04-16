@@ -52,7 +52,7 @@ class Player extends GameObject {
         else if (this.character === "robot"){
             let tx = Math.random() * this.playground.width / this.playground.scale;
             let ty = Math.random() * this.playground.height / this.playground.scale;
-            this.move(tx, ty);
+            this.move_to(tx, ty);
         }
     }
 
@@ -69,7 +69,7 @@ class Player extends GameObject {
             if (tmp.which === 3) {
                 let tx = (tmp.clientX - rect.left) / outer.playground.scale;
                 let ty = (tmp.clientY - rect.top) / outer.playground.scale;
-                outer.move(tx, ty);
+                outer.move_to(tx, ty);
 
                 if(outer.playground.mode === "multi mode"){
                     outer.playground.mps.send_move(tx, ty);
@@ -167,14 +167,14 @@ class Player extends GameObject {
         this.move_length = 0;   //闪现后停止移动
     }
 
-    get_dist(x1, x2, y1, y2){
+    get_dist(x1, y1, x2, y2){
         let dx = x1 - x2;
         let dy = y1 - y2;
         return Math.sqrt(dy * dy + dx * dx);
     }
 
-    move(tx, ty){
-        this.move_length = this.get_dist(this.x, tx, this.y, ty);
+    move_to(tx, ty){
+        this.move_length = this.get_dist(this.x, this.y, tx, ty);
         let angle = Math.atan2(ty - this.y, tx - this.x);
         this.vx = Math.cos(angle);
         this.vy = Math.sin(angle);
@@ -255,7 +255,7 @@ class Player extends GameObject {
                 if(this.character === "robot"){
                     let tx = Math.random() * this.playground.width / this.playground.scale;
                     let ty = Math.random() * this.playground.height / this.playground.scale;
-                    this.move(tx, ty);
+                    this.move_to(tx, ty);
                 }
             } else {
                 let moved = Math.min(this.move_length, this.speed * this.timedelta / 1000);

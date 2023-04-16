@@ -44,12 +44,12 @@ class MultiPlayer(AsyncWebsocketConsumer):
                 self.room_name = keys[0]
         await self.send(text_data = json.dumps(data))
 
-    async def move(self, data):
+    async def move_to(self, data):
         await self.channel_layer.group_send(
             self.room_name,
             {
                 'type': "group_send_event",
-                'event': "move",
+                'event': "move_to",
                 'uid': data['uid'],
                 'tx': data['tx'],
                 'ty': data['ty'],
@@ -83,7 +83,7 @@ class MultiPlayer(AsyncWebsocketConsumer):
         remain_cnt = 0
         for player in players:
             if player['hp'] > 0:
-                remain_name += 1
+                remain_cnt += 1
         if remain_cnt > 1:
             if self.room_name:
                 cache.set(self.room_name, players, 3600)
@@ -143,8 +143,8 @@ class MultiPlayer(AsyncWebsocketConsumer):
         event = data['event']
         if event == "create_player":
             await self.create_player(data)
-        elif event == "move":
-            await self.move(data)
+        elif event == "move_to":
+            await self.move_to(data)
         elif event == "shoot_fireball":
             await self.shoot_fireball(data)
         elif event == "attack":
