@@ -46,28 +46,28 @@ class MultiPlayer(AsyncWebsocketConsumer):
 
     async def move(self, data):
         await self.channel_layer.group_send(
-                self.room_name,
-                {
-                    'type': "group_send_event",
-                    'event': "move",
-                    'uid': data['uid'],
-                    'tx': data['tx'],
-                    'ty': data['ty'],
-                }
-            )
+            self.room_name,
+            {
+                'type': "group_send_event",
+                'event': "move",
+                'uid': data['uid'],
+                'tx': data['tx'],
+                'ty': data['ty'],
+            }
+        )
 
-    async def shoot_ball(self, data):
+    async def shoot_fireball(self, data):
         await self.channel_layer.group_send(
-                self.room_name,
-                {
-                    'type': "group_send_event",
-                    'event': "shoot_ball",
-                    'uid': data['uid'],
-                    'tx': data['tx'],
-                    'ty': data['ty'],
-                    'ball_uid': data['ball_uid'],
-                }
-            )
+            self.room_name,
+            {
+                'type': "group_send_event",
+                'event': "shoot_fireball",
+                'uid': data['uid'],
+                'tx': data['tx'],
+                'ty': data['ty'],
+                'ball_uid': data['ball_uid'],
+            }
+        )
 
     async def attack(self, data):
         if not self.room_name:
@@ -100,43 +100,43 @@ class MultiPlayer(AsyncWebsocketConsumer):
                     await database_sync_to_async(db_update_player_score)(player['username'], 10)
 
         await self.channel_layer.group_send(
-                self.room_name,
-                {
-                    'type': "group_send_event",
-                    'event': "attack",
-                    'uid': data['uid'],
-                    'attackee_uid': data['attackee_uid'],
-                    'x': data['x'],
-                    'y': data['y'],
-                    'angle': data['angle'],
-                    'damage': data['damage'],
-                    'ball_uid': data['ball_uid'],
-                }
-            )
+            self.room_name,
+            {
+                'type': "group_send_event",
+                'event': "attack",
+                'uid': data['uid'],
+                'attackee_uid': data['attackee_uid'],
+                'x': data['x'],
+                'y': data['y'],
+                'angle': data['angle'],
+                'damage': data['damage'],
+                'ball_uid': data['ball_uid'],
+            }
+        )
 
     async def blink(self, data):
         await self.channel_layer.group_send(
-                self.room_name,
-                {
-                    'type': "group_send_event",
-                    'event': "blink",
-                    'uid': data['uid'],
-                    'tx': data['tx'],
-                    'ty': data['ty'],
-                }
-            )
+            self.room_name,
+            {
+                'type': "group_send_event",
+                'event': "blink",
+                'uid': data['uid'],
+                'tx': data['tx'],
+                'ty': data['ty'],
+            }
+        )
 
     async def message(self, data):
         await self.channel_layer.group_send(
-                self.room_name,
-                {
-                    'type': "group_send_event",
-                    'event': "message",
-                    'uid': data['uid'],
-                    'username': data['username'],
-                    'text': data['text'],
-                }
-            )
+            self.room_name,
+            {
+                'type': "group_send_event",
+                'event': "message",
+                'uid': data['uid'],
+                'username': data['username'],
+                'text': data['text'],
+            }
+        )
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -145,8 +145,8 @@ class MultiPlayer(AsyncWebsocketConsumer):
             await self.create_player(data)
         elif event == "move":
             await self.move(data)
-        elif event == "shoot_ball":
-            await self.shoot_ball(data)
+        elif event == "shoot_fireball":
+            await self.shoot_fireball(data)
         elif event == "attack":
             await self.attack(data)
         elif event == "blink":

@@ -33,7 +33,6 @@ class Pool:
         self.players = []
 
     def add_player(self, player):
-        print("Add player: %s %d" % (player.username, player.score))
         self.players.append(player)
 
     def increase_waiting_time(self):
@@ -66,7 +65,7 @@ class Pool:
                 room_name,
                 {
                     'type': "group_send_event",
-                    'event': "creat_player",
+                    'event': "create_player",
                     'uid': p.uid,
                     'username': p.username,
                     'photo': p.photo
@@ -91,6 +90,7 @@ class Pool:
 
 class MatchHandler:
     def add_player(self, score, uid, username, photo, channel_name):
+        print("Add player: %s %d" % (username, score))
         player = Player(score, uid, username, photo, channel_name)
         queue.put(player)
         return 0

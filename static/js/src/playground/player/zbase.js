@@ -146,11 +146,11 @@ class Player extends GameObject {
         }
     }
 
-    destory_fireball(uid){
+    destroy_fireball(uid){
         for(let i = 0; i < this.fireballs.length; i++){
             let fireball = this.fireballs[i];
             if(fireball.uid === uid){
-                fireball.destory();
+                fireball.destroy();
                 break;
             }
         }
@@ -195,7 +195,7 @@ class Player extends GameObject {
         }
         this.r -= damage;
         if (this.r < this.eps){
-            this.del();
+            this.destroy();
             return false;
         } else {
             this.damvx = Math.cos(angle);
@@ -206,7 +206,7 @@ class Player extends GameObject {
     }
 
     receive_attack(x, y, angle, damage, ball_uid, attacker){
-        attacker.destory_fireball(ball_uid);
+        attacker.destroy_fireball(ball_uid);
         this.x = x;
         this.y = y;
         this.attacked(angle, damage);
@@ -325,7 +325,7 @@ class Player extends GameObject {
         }
     }
 
-    on_del(){
+    on_destroy(){
         if(this.character === "me"){
             if(this.playground.state === "fighting"){
                 this.playground.state = "over";

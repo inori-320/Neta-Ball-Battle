@@ -21,7 +21,7 @@ class FireBall extends GameObject {
 
     update(){
         if (this.move_length < this.eps){
-            this.del();
+            this.destroy();
             return false;
         }
         this.update_move();
@@ -72,7 +72,7 @@ class FireBall extends GameObject {
             this.playground.mps.send_attack(player.uid, player.x, player.y, angle, this.damage, this.uid);
         }
 
-        this.del();
+        this.destroy();
     }
 
     render(){
@@ -83,7 +83,7 @@ class FireBall extends GameObject {
         this.ctx.fill();
     }
 
-    on_del(){
+    on_destroy(){
         let fireballs = this.player.fireballs;
         for(let i = 0; i < fireballs.length; i++){
             if(fireballs[i] === this){

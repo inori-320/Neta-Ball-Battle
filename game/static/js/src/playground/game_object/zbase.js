@@ -28,11 +28,11 @@ class GameObject{
     update(){   //每一帧均会执行一次
     }
 
-    on_del(){
+    on_destroy(){
     }
 
-    del(){
-        this.on_del();
+    destroy(){
+        this.on_destroy();
 
         for (let i = 0; i < GAME_OBJECT.length; i++ ){
             if (GAME_OBJECT[i] === this){
