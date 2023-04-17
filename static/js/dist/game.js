@@ -250,9 +250,9 @@ class Player extends GameObject {
         this.friction = 0.7;
         this.fireballs = [];
 
-        if(character !== "robot"){
+        if(this.character !== "robot"){
             this.img = new Image();
-            this.img.src = photo;
+            this.img.src = this.photo;
         }
         if(this.character === "me"){
             this.fireball_coldtime = 3; // 冷却3s
@@ -451,7 +451,7 @@ class Player extends GameObject {
 
     update_win(){
         if(this.playground.state === "fighting" && this.character === "me" && this.playground.players.length === 1){
-            this.playground.state = "win";
+            this.playground.state = "over";
             this.playground.score_board.win();
         }
     }

@@ -81,6 +81,7 @@ class MultiPlayer{
             'tx': tx,
             'ty': ty,
         }));
+        console.log(this.uid);
     }
 
     receive_move(uid, tx, ty){
@@ -88,6 +89,7 @@ class MultiPlayer{
         if(player){
             player.move_to(tx, ty);
         }
+        console.log(player);
     }
 
     send_shoot_fireball(tx, ty, ball_uid){
@@ -126,6 +128,7 @@ class MultiPlayer{
     receive_attack(uid, attackee_uid, x, y, angle, damage, ball_uid){
         let attacker = this.get_player(uid);
         let attackee = this.get_player(attackee_uid);
+        console.log(attack, attackee);
         if(attacker && attackee){
             attackee.receive_attack(x, y, angle, damage, ball_uid, attacker);
         }
