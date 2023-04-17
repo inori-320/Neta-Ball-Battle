@@ -37,9 +37,9 @@ class GamePlayground{
     resize(){
         this.width = this.$playground.width();
         this.height = this.$playground.height();
-        let unit = Math.min(this.width / 20, this.height / 9.5);
-        this.width = unit * 20;
-        this.height = unit * 9.5;
+        let unit = Math.min(this.width / 16, this.height / 9);
+        this.width = unit * 16;
+        this.height = unit * 9;
         this.scale = this.height;
 
         if(this.game_map) this.game_map.resize();
@@ -64,10 +64,10 @@ class GamePlayground{
         this.resize();
 
         this.players = [];
-        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5 , 0.05, 0.2, "pink", "me", this.root.settings.username, this.root.settings.photo));
+        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5 , 0.05, 0.15, "pink", "me", this.root.settings.username, this.root.settings.photo));
         if(mode === "single mode"){
-            for(let i = 0; i < 5; i++){
-                this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), "robot"));
+            for(let i = 0; i < 6; i++){
+                this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.15, this.random_color(), "robot"));
             }
         } else if(mode === "multi mode"){
             this.chat_field = new ChatField(this);

@@ -19,7 +19,6 @@ class MultiPlayer{
             console.log(event);
             let uid = data.uid;
             if(uid === outer.uid) return false;
-
             if (event === "create_player"){
                 outer.receive_create_player(uid, data.username, data.photo);
             } else if (event === "move_to"){
@@ -33,15 +32,14 @@ class MultiPlayer{
             } else if (event === "message"){
                 outer.receive_message(uid, data.username, data.text);
             }
-        };
+        }
     }
 
     get_player(uid){
         let players = this.playground.players;
         for (let i = 0; i < players.length; i++){
             let player = players[i];
-            if(player.uid === uid)
-                return player;
+            if(player.uid === uid) return player;
         }
         return null;
     }
@@ -62,8 +60,8 @@ class MultiPlayer{
             this.playground.width / 2 / this.playground.scale,
             0.5,
             0.05,
-            "white",
             0.15,
+            "pink",
             "enemy",
             username,
             photo
@@ -81,15 +79,14 @@ class MultiPlayer{
             'tx': tx,
             'ty': ty,
         }));
-        console.log(this.uid);
     }
 
     receive_move(uid, tx, ty){
+        let outer = this;
         let player = this.get_player(uid);
         if(player){
             player.move_to(tx, ty);
         }
-        console.log(player);
     }
 
     send_shoot_fireball(tx, ty, ball_uid){
@@ -104,6 +101,7 @@ class MultiPlayer{
     }
 
     receive_shoot_fireball(uid, tx, ty, ball_uid){
+        let outer = this;
         let player = this.get_player(uid);
         if(player){
             let ball = player.shoot_ball("fireball", tx, ty);
@@ -128,7 +126,6 @@ class MultiPlayer{
     receive_attack(uid, attackee_uid, x, y, angle, damage, ball_uid){
         let attacker = this.get_player(uid);
         let attackee = this.get_player(attackee_uid);
-        console.log(attack, attackee);
         if(attacker && attackee){
             attackee.receive_attack(x, y, angle, damage, ball_uid, attacker);
         }

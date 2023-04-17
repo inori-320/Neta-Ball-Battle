@@ -247,7 +247,7 @@ class Player extends GameObject {
         this.move_length = 0;
         this.cur_skill = null;
         this.cold_time = 0;
-        this.friction = 0.7;
+        this.friction = 0.9;
         this.fireballs = [];
 
         if(this.character !== "robot"){
@@ -358,14 +358,14 @@ class Player extends GameObject {
     shoot_ball(cur, tx, ty){
         let x = this.x;
         let y = this.y;
-        let r = 0.02;
+        let r = 0.01;
         let angle = Math.atan2(ty - this.y, tx - this.x);
         let vx = Math.cos(angle);
         let vy = Math.sin(angle);
         if(cur === "fireball"){
             let color = "orange";
             let speed = 0.5;
-            let move_length = 0.8;
+            let move_length = 1;
             let fireball = new FireBall(this.playground, this, x, y, r, vx, vy, color, speed, move_length, 0.01);
             this.fireballs.push(fireball);
             this.fireball_coldtime = 3;
@@ -385,7 +385,7 @@ class Player extends GameObject {
 
     blink(tx, ty){
         let d = this.get_dist(this.x, this.y, tx, ty);
-        d = Math.min(d, 0.7);
+        d = Math.min(d, 0.8);
         let angle = Math.atan2(ty - this.y, tx - this.x);
         this.x += d * Math.cos(angle);
         this.y += d * Math.sin(angle);
@@ -405,19 +405,20 @@ class Player extends GameObject {
         let angle = Math.atan2(ty - this.y, tx - this.x);
         this.vx = Math.cos(angle);
         this.vy = Math.sin(angle);
+        console.log(this.x, this.y, this.move_length);
     }
 
     attacked(angle, damage){
-        for (let i = 0; i < 10 + Math.random() * 8; i++){
+        for (let i = 0; i < 20 + Math.random() * 10; i++){
             let x = this.x;
             let y = this.y;
-            let r = this.r * Math.random() * 0.2;
+            let r = this.r * Math.random() * 0.1;
             let angle = Math.PI * 2 * Math.random();
             let vx = Math.cos(angle);
             let vy = Math.sin(angle);
             let color = this.color;
             let speed = this.speed * 10;
-            let move_length = this.r * Math.random() * 7;
+            let move_length = this.r * Math.random() * 5;
             new Particle(this.playground, x, y, r, vx, vy, speed, color, move_length);
         }
         this.r -= damage;
@@ -427,7 +428,7 @@ class Player extends GameObject {
         } else {
             this.damvx = Math.cos(angle);
             this.damvy = Math.sin(angle);
-            this.damspeed = damage * 70;
+            this.damspeed = damage * 100;
             this.speed *= 1.2;
         }
     }
@@ -465,7 +466,7 @@ class Player extends GameObject {
     }
 
     update_move(){
-        if(this.character === "robot" && this.cold_time > 3 && Math.random() < 1 / 250.0){
+        if(this.character === "robot" && this.cold_time > 4 && Math.random() < 1 / 300.0){
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
             let tx = player.x + player.speed * this.vx * this.timedelta / 1000 * 0.3;
             let ty = player.y + player.speed * this.vy * this.timedelta / 1000 * 0.3;
@@ -516,7 +517,7 @@ class Player extends GameObject {
 
     render_skill_coldtime(){
         let scale = this.playground.scale;
-        let x = 1.7, y = 0.9, r = 0.04;
+        let x = 1.5, y = 0.9, r = 0.04;
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.arc(x * scale, y * scale, r * scale, 0, Math.PI * 2, false);
@@ -534,7 +535,7 @@ class Player extends GameObject {
             this.ctx.fill();
         }
 
-        x = 1.82, y = 0.9, r = 0.04;
+        x = 1.62, y = 0.9, r = 0.04;
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.arc(x * scale, y * scale, r * scale, 0, Math.PI * 2, false);
@@ -809,6 +810,7 @@ class MultiPlayer{
         this.ws.onmessage = function(s) {
             let data = JSON.parse(s.data);
             let event = data.event;
+            console.log(event);
             let uid = data.uid;
             if(uid === outer.uid) return false;
             if (event === "create_player"){
@@ -852,8 +854,8 @@ class MultiPlayer{
             this.playground.width / 2 / this.playground.scale,
             0.5,
             0.05,
-            "white",
             0.15,
+            "pink",
             "enemy",
             username,
             photo
@@ -993,9 +995,9 @@ class GamePlayground{
     resize(){
         this.width = this.$playground.width();
         this.height = this.$playground.height();
-        let unit = Math.min(this.width / 20, this.height / 9.5);
-        this.width = unit * 20;
-        this.height = unit * 9.5;
+        let unit = Math.min(this.width / 16, this.height / 9);
+        this.width = unit * 16;
+        this.height = unit * 9;
         this.scale = this.height;
 
         if(this.game_map) this.game_map.resize();
@@ -1020,10 +1022,10 @@ class GamePlayground{
         this.resize();
 
         this.players = [];
-        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5 , 0.05, 0.2, "pink", "me", this.root.settings.username, this.root.settings.photo));
+        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5 , 0.05, 0.15, "pink", "me", this.root.settings.username, this.root.settings.photo));
         if(mode === "single mode"){
-            for(let i = 0; i < 5; i++){
-                this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.2, this.random_color(), "robot"));
+            for(let i = 0; i < 6; i++){
+                this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, 0.15, this.random_color(), "robot"));
             }
         } else if(mode === "multi mode"){
             this.chat_field = new ChatField(this);

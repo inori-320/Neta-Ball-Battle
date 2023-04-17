@@ -16,6 +16,7 @@ class MultiPlayer{
         this.ws.onmessage = function(s) {
             let data = JSON.parse(s.data);
             let event = data.event;
+            console.log(event);
             let uid = data.uid;
             if(uid === outer.uid) return false;
             if (event === "create_player"){
@@ -59,8 +60,8 @@ class MultiPlayer{
             this.playground.width / 2 / this.playground.scale,
             0.5,
             0.05,
-            "white",
             0.15,
+            "pink",
             "enemy",
             username,
             photo
