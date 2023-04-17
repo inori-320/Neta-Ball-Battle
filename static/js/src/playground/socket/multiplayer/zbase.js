@@ -16,7 +16,6 @@ class MultiPlayer{
         this.ws.onmessage = function(s) {
             let data = JSON.parse(s.data);
             let event = data.event;
-            console.log(event);
             let uid = data.uid;
             if(uid === outer.uid) return false;
             if (event === "create_player"){

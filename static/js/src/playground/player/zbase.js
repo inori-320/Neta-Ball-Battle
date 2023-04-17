@@ -178,7 +178,6 @@ class Player extends GameObject {
         let angle = Math.atan2(ty - this.y, tx - this.x);
         this.vx = Math.cos(angle);
         this.vy = Math.sin(angle);
-        console.log(this.x, this.y, this.move_length);
     }
 
     attacked(angle, damage){
