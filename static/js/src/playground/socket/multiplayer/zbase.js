@@ -24,8 +24,10 @@ class MultiPlayer{
                 outer.receive_move(uid, data.tx, data.ty);
             } else if (event === "shoot_fireball"){
                 outer.receive_shoot_fireball(uid, data.tx, data.ty, data.ball_uid);
+            } else if (event === "shoot_iceball"){
+                outer.receive_shoot_iceball(uid, data.tx, data.ty, data.ball_uid);
             } else if (event === "attack"){
-                outer.receive_attack(uid, data.attackee_uid, data.x, data.y, data.angle, data.damage, data.ball_uid);
+                outer.receive_attack(uid, data.attackee_uid, data.x, data.y, data.angle, data.damage, data.ball_uid, data.skill);
             } else if (event === "blink"){
                 outer.receive_blink(uid, data.tx, data.ty);
             } else if (event === "message"){
@@ -95,12 +97,12 @@ class MultiPlayer{
             'uid': outer.uid,
             'tx': tx,
             'ty':ty,
-            'ball_uid': ball_uid
+            'ball_uid': ball_uid,
+            'skill': "fireball"
         }));
     }
 
     receive_shoot_fireball(uid, tx, ty, ball_uid){
-        let outer = this;
         let player = this.get_player(uid);
         if(player){
             let ball = player.shoot_ball("fireball", tx, ty);
@@ -108,7 +110,27 @@ class MultiPlayer{
         }
     }
 
-    send_attack(attackee_uid, x, y, angle, damage, ball_uid){
+    send_shoot_iceball(tx, ty, ball_uid){
+        let outer = this;
+        this.ws.send(JSON.stringify({
+            'event': "shoot_iceball",
+            'uid': outer.uid,
+            'tx': tx,
+            'ty': ty,
+            'ball_uid': ball_uid,
+            'skill': "iceball"
+        }));
+    }
+
+    receive_shoot_iceball(uid, tx, ty, ball_uid){
+        let player = this.get_player(uid);
+        if(player){
+            let ball = player.shoot_ball("iceball", tx, ty);
+            ball.uid = ball_uid;
+        }
+    }
+
+    send_attack(attackee_uid, x, y, angle, damage, ball_uid, skill){
         let outer = this;
         this.ws.send(JSON.stringify({
             'event': "attack",
@@ -118,15 +140,16 @@ class MultiPlayer{
             'y': y,
             'angle': angle,
             'damage': damage,
-            'ball_uid': ball_uid
+            'ball_uid': ball_uid,
+            'skill': skill
         }));
     }
 
-    receive_attack(uid, attackee_uid, x, y, angle, damage, ball_uid){
+    receive_attack(uid, attackee_uid, x, y, angle, damage, ball_uid, skill){
         let attacker = this.get_player(uid);
         let attackee = this.get_player(attackee_uid);
         if(attacker && attackee){
-            attackee.receive_attack(x, y, angle, damage, ball_uid, attacker);
+            attackee.receive_attack(x, y, angle, damage, ball_uid, attacker, skill);
         }
     }
 

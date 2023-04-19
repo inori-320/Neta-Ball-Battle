@@ -46,8 +46,8 @@ class GamePlayground{
     }
 
     random_color() {
-        let colors = ["blue", "green", "red", "white", "grey", "purple"];
-        return colors[Math.floor(Math.random() * 6)];
+        let colors = ["#FFFFCC", "#FFCCCC", "#FFCC99", "#996699", "#FF9999", "#0099CC", "#CCCCCC", "#CC9999", "#CCCCFF", "#990066", "#CC3399", "#009966", "#999900", "#990033", "#CCFF99", "#9933CC", "#FFFF00", "#CC3333", "#3366CC", "#CCCC13", "#99CC99", "#6666CC", "#FF9933", "#EE82EE", "#8A2BE2", "#000080", "#FF1493", "#40E0D0", "#FFF5EE", "#9932CC", "#FFB6C1"];
+        return colors[Math.floor(Math.random() * colors.length)];
     }
 
     show(mode){

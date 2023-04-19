@@ -22,6 +22,7 @@ class Player extends GameObject {
         this.cold_time = 0;
         this.friction = 0.9;
         this.fireballs = [];
+        this.iceballs = [];
 
         if(this.character !== "robot"){
             this.img = new Image();
@@ -31,6 +32,10 @@ class Player extends GameObject {
             this.fireball_coldtime = 3; // 冷却3s
             this.fireball_img = new Image();
             this.fireball_img.src = "https://app4634.acapp.acwing.com.cn/static/image/playground/fireball.png";
+
+            this.iceball_coldtime = 4;
+            this.iceball_img = new Image();
+            this.iceball_img.src = "https://app4634.acapp.acwing.com.cn/static/image/playground/iceball.png";
 
             this.blink_coldtime = 5;
             this.blink_img = new Image();
@@ -85,7 +90,15 @@ class Player extends GameObject {
                     if(outer.playground.mode === "multi mode"){
                         outer.playground.mps.send_shoot_fireball(tx, ty, fireball.uid);
                     }
-                } else if (outer.cur_skill === "blink"){
+                } else if(outer.cur_skill === "iceball"){
+                    if(outer.iceball_coldtime > outer.eps){
+                        return false;
+                    }
+                    let iceball = outer.shoot_ball("iceball", tx, ty);
+                    if(outer.playground.mode === "multi mode"){
+                        outer.playground.mps.send_shoot_iceball(tx, ty, iceball.uid);
+                    }
+                } else if(outer.cur_skill === "blink"){
                     if(outer.blink_coldtime > outer.eps){
                         return false;
                     }
@@ -113,18 +126,21 @@ class Player extends GameObject {
                 if(outer.fireball_coldtime > outer.eps){
                     return true;
                 }
-
                 outer.cur_skill = "fireball";
                 return false;
             } else if (tmp.which === 70){      //表示F键
                 if(outer.blink_coldtime > outer.eps){
                     return true;
                 }
-
                 outer.cur_skill = "blink";
                 return false;
+            } else if (tmp.which === 87){   //表示W键
+                if(outer.iceball_coldtime > outer.eps){
+                    return true;
+                }
+                outer.cur_skill = "iceball";
+                return false;
             }
-
         });
     }
 
@@ -143,6 +159,14 @@ class Player extends GameObject {
             this.fireballs.push(fireball);
             this.fireball_coldtime = 3;
             return fireball;
+        } else if (cur === "iceball"){
+            let color = "#CCFFFF";
+            let speed = 0.5;
+            let move_length = 1;
+            let iceball = new IceBall(this.playground, this, x, y, r, vx, vy, color, speed, move_length, 0.01);
+            this.iceballs.push(iceball);
+            this.iceball_coldtime = 4;
+            return iceball;
         }
     }
 
@@ -151,6 +175,16 @@ class Player extends GameObject {
             let fireball = this.fireballs[i];
             if(fireball.uid === uid){
                 fireball.destroy();
+                break;
+            }
+        }
+    }
+
+    destory_iceball(uid){
+        for(let i = 0; i < this.iceballs.length; i++){
+            let iceball = this.iceballs[i];
+            if(iceball.uid === uid){
+                iceball.destroy();
                 break;
             }
         }
@@ -180,7 +214,7 @@ class Player extends GameObject {
         this.vy = Math.sin(angle);
     }
 
-    attacked(angle, damage){
+    attacked(angle, damage, skill){
         for (let i = 0; i < 20 + Math.random() * 10; i++){
             let x = this.x;
             let y = this.y;
@@ -197,19 +231,31 @@ class Player extends GameObject {
         if (this.r < this.eps){
             this.destroy();
             return false;
-        } else {
+        } else if (skill === "fireball"){
             this.damvx = Math.cos(angle);
             this.damvy = Math.sin(angle);
             this.damspeed = damage * 100;
             this.speed *= 1.2;
+        } else if (skill === "iceball"){
+            let outer = this;
+            this.move_length = 0;
+            let sped = this.speed;
+            this.speed *= 0.5;
+            setTimeout(function(){
+                outer.speed = sped;
+            }, 2000);
         }
     }
 
-    receive_attack(x, y, angle, damage, ball_uid, attacker){
-        attacker.destroy_fireball(ball_uid);
+    receive_attack(x, y, angle, damage, ball_uid, attacker, skill){
+        if(skill === "fireball"){
+            attacker.destroy_fireball(ball_uid);
+        } else if (skill === "iceball"){
+            attacker.destroy_iceball(ball_uid);
+        }
         this.x = x;
         this.y = y;
-        this.attacked(angle, damage);
+        this.attacked(angle, damage, skill);
     }
 
     update(){
@@ -233,16 +279,24 @@ class Player extends GameObject {
         this.fireball_coldtime -= this.timedelta / 1000;
         this.fireball_coldtime = Math.max(this.fireball_coldtime, 0);
 
+        this.iceball_coldtime -= this.timedelta / 1000;
+        this.iceball_coldtime = Math.max(this.iceball_coldtime, 0);
+
         this.blink_coldtime -= this.timedelta / 1000;
         this.blink_coldtime = Math.max(this.blink_coldtime, 0);
     }
 
     update_move(){
-        if(this.character === "robot" && this.cold_time > 4 && Math.random() < 1 / 300.0){
+        if(this.character === "robot" && this.cold_time > 3 && Math.random() < 1 / 300.0){
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
             let tx = player.x + player.speed * this.vx * this.timedelta / 1000 * 0.3;
             let ty = player.y + player.speed * this.vy * this.timedelta / 1000 * 0.3;
-            this.shoot_ball("fireball", tx, ty);
+            let num = Math.random();
+            if (num < 0.6){
+                this.shoot_ball("fireball", tx, ty);
+            } else {
+                this.shoot_ball("iceball", tx, ty);
+            }
         }
         if(this.damspeed > this.eps) {
             this.vx = this.vy = this.move_length = 0;
@@ -289,7 +343,7 @@ class Player extends GameObject {
 
     render_skill_coldtime(){
         let scale = this.playground.scale;
-        let x = 1.5, y = 0.9, r = 0.04;
+        let x = 1.4, y = 0.9, r = 0.04;
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.arc(x * scale, y * scale, r * scale, 0, Math.PI * 2, false);
@@ -307,7 +361,25 @@ class Player extends GameObject {
             this.ctx.fill();
         }
 
-        x = 1.62, y = 0.9, r = 0.04;
+        x = 1.52, y = 0.9, r = 0.04;
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.arc(x * scale, y * scale, r * scale, 0, Math.PI * 2, false);
+        this.ctx.stroke();
+        this.ctx.clip;
+        this.ctx.drawImage(this.iceball_img, (x - r) * scale, (y - r) * scale, r * 2 * scale, r * 2 * scale);
+        this.ctx.restore();
+
+        if(this.iceball_coldtime > 0){
+            this.ctx.beginPath();
+            this.ctx.moveTo(x * scale, y * scale);
+            this.ctx.arc(x * scale, y * scale, r * scale, 0 - Math.PI / 2, Math.PI * 2 * (1 - this.iceball_coldtime / 4) - Math.PI / 2, true);
+            this.ctx.lineTo(x * scale, y * scale);
+            this.ctx.fillStyle = "rgba(0, 0, 255, 0.6)";
+            this.ctx.fill();
+        }
+
+        x = 1.64, y = 0.9, r = 0.04;
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.arc(x * scale, y * scale, r * scale, 0, Math.PI * 2, false);
@@ -315,6 +387,7 @@ class Player extends GameObject {
         this.ctx.clip();
         this.ctx.drawImage(this.blink_img, (x - r) * scale, (y - r) * scale, r * 2 * scale, r * 2 * scale);
         this.ctx.restore();
+
         if(this.blink_coldtime > 0){
             this.ctx.beginPath();
             this.ctx.moveTo(x * scale, y * scale);
