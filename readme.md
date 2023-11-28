@@ -1,4 +1,4 @@
-# 毕业设计
-编写于2023年5月。
-使用Django和JavaScript编写的网页小游戏。
-开发环境为Ubtuntu20.04，原先在云服务器上部署，但是现在服务器过期了没有续费，所以直接clone是无法运行的，需要更改在配置中更改ip。
+# my diploma project
+Written in May 2023.<br>
+A web game written using Django and JavaScript.<br>
+The development environment is Ubtuntu20.04. It was originally deployed on a cloud server, but now the server has expired and has not been renewed, so cloning directly cannot run. It needs to be changed in the configuration to change the IP address.
